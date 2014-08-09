@@ -8,11 +8,8 @@ import com.newfivefour.natcher.Application;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.internal.DiskLruCache;
-import com.squareup.okhttp.internal.Util;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import retrofit.RestAdapter;
@@ -84,15 +81,9 @@ public class MessageBusService<ReturnResult, ServiceClass> {
                 @Override
                 protected ReturnResult doInBackground(Void... params) {
                     try {
-                        FilterInputStream cached = getFromCache(endPoint+cachedResponseUri);
-                        Scanner sc = new Scanner(cached);
-                        String str="", s;
-                        while(sc.hasNext() && (s=sc.nextLine())!=null) {
-                            str = str + s;
-                        }
-                        ReturnResult recentPosts = new Gson().fromJson(str, returnType);
+                        ReturnResult cached = ResponseCache.getObject(endPoint + cachedResponseUri, returnType);
                         Log.d(TAG, "Sending back cached version");
-                        return recentPosts;
+                        return cached;
                     } catch(Exception e) {
                         Log.d(TAG, "Problem getting from cache", e);
                         return null;
@@ -104,6 +95,8 @@ public class MessageBusService<ReturnResult, ServiceClass> {
                     if(res!=null) {
                         Log.d(TAG, "onPostExecute() Sending back cached response initially.");
                         Application.getEventBus().post(cacheResponse.setCache(res));
+                    } else {
+                        Log.d(TAG, "onPostExecute() No cached result to send back.");
                     }
                 }
             }.execute();
@@ -179,31 +172,6 @@ public class MessageBusService<ReturnResult, ServiceClass> {
                 .setLog(new AndroidLog("OkHTTP"))
                 .build();
         return restAdapter.create(serviceClass);
-    }
-
-    public FilterInputStream getFromCache(String url) throws Exception {
-        DiskLruCache cache = getDiskLruCache();
-        cache.flush();
-        String key = Util.hash(url);
-        final DiskLruCache.Snapshot snapshot;
-        try {
-            snapshot = cache.get(key);
-            if (snapshot == null) {
-                return null;
-            }
-        } catch (IOException e) {
-            return null;
-        }
-
-        FilterInputStream bodyIn = new FilterInputStream(snapshot.getInputStream(1)) {
-            @Override
-            public void close() throws IOException {
-                snapshot.close();
-                super.close();
-            }
-        };
-
-        return bodyIn;
     }
 
 }
