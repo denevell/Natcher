@@ -1,50 +1,49 @@
 package com.newfivefour.natcher;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.newfivefour.natcher.networking.RecentPostsService;
-import com.squareup.otto.Subscribe;
 
-
-public class NatcherActivity extends Activity {
+public class NatcherActivity extends ActionBarActivity {
 
     private TextView mTextView;
+    private NatcherPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.natcher_activity);
         mTextView = (TextView) findViewById(R.id.textView);
+        mPresenter = new NatcherPresenter(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Application.getEventBus().register(this);
-        new RecentPostsService().fetch();
+        mPresenter.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Application.getEventBus().unregister(this);
+        mPresenter.onPause();
     }
 
-    @Subscribe
-    public void recentPosts(RecentPostsService.RecentPosts posts) {
-        mTextView.setText(posts.getPosts().get(0).getContent());
+    public void setText(String text) {
+        mTextView.setText(text);
     }
 
-    @Subscribe
-    public void recentPostsCached(RecentPostsService.RecentPostsCached cached) {
-        mTextView.setText("Cached: " + cached.returnCached().getPosts().get(0).getContent());
+    public void setError(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 
-    @Subscribe
-    public void recentPostsError(RecentPostsService.RecentPostsError error) {
-        Toast.makeText(this, "Network error", Toast.LENGTH_LONG).show();
+    public void startLoading(boolean b) {
+        setProgressBarIndeterminateVisibility(b);
+        setProgressBarIndeterminate(b);
+        setProgressBarVisibility(b);
     }
 }
