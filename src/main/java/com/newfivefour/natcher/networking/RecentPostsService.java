@@ -26,6 +26,7 @@ public class RecentPostsService {
                 },
                 new RecentPostsError(),
                 new RecentPostsCached(),
+                "/post/0/10",
                 RecentPosts.class
         );
     }

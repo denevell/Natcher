@@ -8,11 +8,13 @@ import com.newfivefour.natcher.Application;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.internal.DiskLruCache;
+import com.squareup.okhttp.internal.Util;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.android.AndroidLog;
@@ -29,8 +31,16 @@ public class MessageBusService<ReturnResult, ServiceClass> {
         public ReturnResult getResult(ServiceClass mService) throws Exception;
     }
 
-    public static interface ReturnResultAdapter<ReturnResult> {
-        public void adapt(ReturnResult res);
+    public static class CachedResponse<ReturnResult> {
+        private ReturnResult mRes;
+
+        public CachedResponse<ReturnResult> setCache(ReturnResult res) {
+            mRes = res;
+            return this;
+        }
+        public ReturnResult returnCached() {
+            return mRes;
+        }
     }
 
     private DiskLruCache getDiskLruCache() throws IOException {
@@ -41,8 +51,10 @@ public class MessageBusService<ReturnResult, ServiceClass> {
                       Class<ServiceClass> serviceClass,
                       final GetResult<ReturnResult, ServiceClass> getResult,
                       ErrorResponse errorResponse,
+                      final CachedResponse<ReturnResult> cacheResponse,
+                      String cacheResponseUri,
                       Class<? extends ReturnResult> returnType) {
-        fetch(endPoint, serviceClass, new GsonConverter(new Gson()), getResult, errorResponse, returnType);
+        fetch(endPoint, serviceClass, new GsonConverter(new Gson()), getResult, errorResponse, cacheResponse, cacheResponseUri, returnType);
     }
 
     /**
@@ -59,10 +71,43 @@ public class MessageBusService<ReturnResult, ServiceClass> {
                       Converter converter,
                       final GetResult<ReturnResult, ServiceClass> getResult,
                       final ErrorResponse errorResponse,
+                      final CachedResponse<ReturnResult> cacheResponse,
+                      final String cachedResponseUri,
                       final Class<? extends ReturnResult> returnType) {
 
-        final OkClient ok = createHttpClient();
+        OkClient ok = createHttpClient();
         final ServiceClass service = createServiceClass(endPoint, serviceClass, converter, ok);
+
+        // Try to get from cache initially
+        if(cachedResponseUri!=null) {
+            new AsyncTask<Void, Void, ReturnResult>() {
+                @Override
+                protected ReturnResult doInBackground(Void... params) {
+                    try {
+                        FilterInputStream cached = getFromCache(endPoint+cachedResponseUri);
+                        Scanner sc = new Scanner(cached);
+                        String str="", s;
+                        while(sc.hasNext() && (s=sc.nextLine())!=null) {
+                            str = str + s;
+                        }
+                        ReturnResult recentPosts = new Gson().fromJson(str, returnType);
+                        Log.d(TAG, "Sending back cached version");
+                        return recentPosts;
+                    } catch(Exception e) {
+                        Log.d(TAG, "Problem getting from cache", e);
+                        return null;
+                    }
+                }
+                @Override
+                protected void onPostExecute(ReturnResult res) {
+                    Log.d(TAG, "onPostExecute() (cached)");
+                    if(res!=null) {
+                        Log.d(TAG, "onPostExecute() Sending back cached response initially.");
+                        Application.getEventBus().post(cacheResponse.setCache(res));
+                    }
+                }
+            }.execute();
+        }
 
         // Call the service in an async task, sending the success or error to the event bus
         new AsyncTask<Void, Void, ReturnResult>() {
@@ -130,17 +175,35 @@ public class MessageBusService<ReturnResult, ServiceClass> {
                 .setEndpoint(endPoint)
                 .setConverter(converter)
                 .setClient(ok)
-                .setRequestInterceptor(new RequestInterceptor() {
-                    @Override
-                    public void intercept(RequestFacade request) {
-                        int maxStale = 60 * 60 * 24 * 28; // tolerate 4-weeks stale
-                        request.addHeader("Cache-Control", "public, only-if-cached, max-stale=" + maxStale);
-                    }
-                })
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setLog(new AndroidLog("OkHTTP"))
                 .build();
         return restAdapter.create(serviceClass);
+    }
+
+    public FilterInputStream getFromCache(String url) throws Exception {
+        DiskLruCache cache = getDiskLruCache();
+        cache.flush();
+        String key = Util.hash(url);
+        final DiskLruCache.Snapshot snapshot;
+        try {
+            snapshot = cache.get(key);
+            if (snapshot == null) {
+                return null;
+            }
+        } catch (IOException e) {
+            return null;
+        }
+
+        FilterInputStream bodyIn = new FilterInputStream(snapshot.getInputStream(1)) {
+            @Override
+            public void close() throws IOException {
+                snapshot.close();
+                super.close();
+            }
+        };
+
+        return bodyIn;
     }
 
 }
