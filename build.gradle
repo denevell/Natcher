@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         jcenter()
+	mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
@@ -8,6 +9,21 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+        compile 'com.google.code.gson:gson:2.2.4'
+        compile "com.android.support:appcompat-v7:19.1.0"
+        compile 'com.android.support:support-v4:19.1.0'
+    	compile 'com.android.support:support-v13:19.1.0'
+        compile 'com.squareup.retrofit:retrofit:1.6.1'
+        compile 'com.squareup.okhttp:okhttp:2.0.0'
+        compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+        compile 'com.squareup:otto:1.3.4'
+}
 
 android {
     compileSdkVersion 19
