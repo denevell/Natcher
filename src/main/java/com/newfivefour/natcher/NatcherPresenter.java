@@ -17,7 +17,7 @@ public class NatcherPresenter implements Presenter {
     public void onResume() {
         Application.getEventBus().register(this);
         mView.startLoading(true);
-        new PostsRecentService().fetch(mView);
+        new PostsRecentService().fetch(mView.getArguments());
     }
 
     @Override

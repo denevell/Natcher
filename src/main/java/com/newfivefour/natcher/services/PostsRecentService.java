@@ -1,6 +1,6 @@
 package com.newfivefour.natcher.services;
 
-import android.support.v4.app.Fragment;
+import android.os.Bundle;
 
 import com.newfivefour.natcher.networking.ErrorResponse;
 import com.newfivefour.natcher.networking.NetworkingMessageBusService;
@@ -19,12 +19,12 @@ public class PostsRecentService {
     }
 
     @SuppressWarnings("unchecked")
-    public void fetch(Fragment f) {
+    public void fetch(Bundle f) {
         String baseUrl = "https://android-manchester.co.uk/api/rest";
 
         new NetworkingMessageBusService.Builder<RecentPosts, RecentPostsServiceInterface>()
                 .cacheRequest("/post/0/10", new RecentPostsCached())
-                .requestUuidBundle(f.getArguments())
+                .requestUuidBundle(f)
                 .fetch(baseUrl,
                         RecentPostsServiceInterface.class,
                         new NetworkingMessageBusService.GetResult<RecentPosts, RecentPostsServiceInterface>() {

@@ -1,5 +1,7 @@
 package com.newfivefour.natcher.networking;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.newfivefour.natcher.app.Application;
 import com.squareup.okhttp.internal.DiskLruCache;
@@ -14,11 +16,15 @@ import java.util.Scanner;
  */
 public class ResponseCache {
     public static final int SIZE_OF_RESPONSE_CACHE = 10000 * 5;
+    private static final String TAG = ResponseCache.class.getSimpleName();
+    private static DiskLruCache cache;
 
     private static FilterInputStream getFromCache(String url) throws Exception {
         // WARNING: The 201105 and 2 values come directly from the OkHTTP code - when they change, this should too.
-        DiskLruCache cache = DiskLruCache.open(Application.getContext().getCacheDir(), 201105, 2, SIZE_OF_RESPONSE_CACHE);
-        cache.flush();
+        if(cache==null) {
+            cache = DiskLruCache.open(Application.getContext().getCacheDir(), 201105, 2, SIZE_OF_RESPONSE_CACHE);
+        }
+        //cache.flush();
         String key = Util.hash(url);
         final DiskLruCache.Snapshot snapshot;
         try {
@@ -27,6 +33,7 @@ public class ResponseCache {
                 return null;
             }
         } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
 
@@ -44,6 +51,13 @@ public class ResponseCache {
     public static <T> T getObject(String fullUrl, Class<T> type) {
         try {
             FilterInputStream cached = ResponseCache.getFromCache(fullUrl);
+            if(cached==null) {
+                cached = ResponseCache.getFromCache(fullUrl);
+                if(cached==null) {
+                    Log.e(TAG, "Can't find snapshot after retrying once");
+                    return null;
+                }
+            }
             Scanner sc = new Scanner(cached);
             String str="", s;
             while(sc.hasNext() && (s=sc.nextLine())!=null) {

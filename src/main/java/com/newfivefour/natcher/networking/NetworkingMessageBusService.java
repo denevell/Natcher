@@ -182,10 +182,15 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                     Application.getEventBus().post(errorResponse);
                 }
             }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
     }
 
     private void returnCacheIfAvailable(final String fullCachedUrl, final CachedResponse<ReturnResult> cacheResponse, final Class<? extends ReturnResult> returnType) {
+        ReturnResult cached = ResponseCache.getObject(fullCachedUrl, returnType);
+        if(cached!=null) {
+            Application.getEventBus().post(cacheResponse.setCache(cached));
+        }
+        /*
         if(cacheResponse!=null) {
             new AsyncTask<Void, Void, ReturnResult>() {
                 @Override
@@ -210,8 +215,9 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                         Log.d(TAG, "onPostExecute() No cached result to send back.");
                     }
                 }
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
         }
+        */
     }
 
     private OkClient createHttpClient() {

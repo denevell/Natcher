@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:inputType="textMultiLine|textCapSentences"
+        android:ems="10"
+        android:id="@+id/editText"
+        android:layout_gravity="left|top"
+        android:hint="Start typing post"
+        android:gravity="start|top" />
+</FrameLayout>
