@@ -1,4 +1,4 @@
-package com.newfivefour.natcher;
+package com.newfivefour.natcher.app;
 
 import android.content.Context;
 

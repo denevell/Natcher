@@ -1,15 +1,14 @@
 package com.newfivefour.natcher.networking;
 
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.newfivefour.natcher.Application;
+import com.newfivefour.natcher.app.Application;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.internal.DiskLruCache;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import retrofit.RestAdapter;
@@ -40,18 +39,23 @@ public class MessageBusService<ReturnResult, ServiceClass> {
         }
     }
 
-    private DiskLruCache getDiskLruCache() throws IOException {
-        return DiskLruCache.open(Application.getContext().getCacheDir(), 201105, 2, SIZE_OF_RESPONSE_CACHE);
-    }
-
     public void fetch(String endPoint,
                       Class<ServiceClass> serviceClass,
-                      final GetResult<ReturnResult, ServiceClass> getResult,
+                      GetResult<ReturnResult, ServiceClass> getResult,
                       ErrorResponse errorResponse,
-                      final CachedResponse<ReturnResult> cacheResponse,
+                      CachedResponse<ReturnResult> cacheResponse,
                       String cacheResponseUri,
+                      Bundle bundleForRequestUuid,
                       Class<? extends ReturnResult> returnType) {
-        fetch(endPoint, serviceClass, new GsonConverter(new Gson()), getResult, errorResponse, cacheResponse, cacheResponseUri, returnType);
+        fetch(endPoint,
+                serviceClass,
+                new GsonConverter(new Gson()),
+                getResult,
+                errorResponse,
+                cacheResponse,
+                cacheResponseUri,
+                bundleForRequestUuid,
+                returnType);
     }
 
     /**
@@ -66,16 +70,74 @@ public class MessageBusService<ReturnResult, ServiceClass> {
     public void fetch(final String endPoint,
                       Class<ServiceClass> serviceClass,
                       Converter converter,
-                      final GetResult<ReturnResult, ServiceClass> getResult,
-                      final ErrorResponse errorResponse,
-                      final CachedResponse<ReturnResult> cacheResponse,
-                      final String cachedResponseUri,
-                      final Class<? extends ReturnResult> returnType) {
+                      GetResult<ReturnResult, ServiceClass> getResult,
+                      ErrorResponse errorResponse,
+                      CachedResponse<ReturnResult> cacheResponse,
+                      String cachedResponseUri,
+                      Bundle requestUuidBundle,
+                      Class<? extends ReturnResult> returnType) {
 
         OkClient ok = createHttpClient();
-        final ServiceClass service = createServiceClass(endPoint, serviceClass, converter, ok);
+        ServiceClass service = createServiceClass(endPoint, serviceClass, converter, ok);
+        returnCacheIfAvailable(endPoint, cacheResponse, cachedResponseUri, returnType);
 
-        // Try to get from cache initially
+        String requestUuid = RequestQueue.getUuidFromBundle(requestUuidBundle);
+        if(RequestQueue.isRequestUnderway(requestUuid)) {
+            Log.d(TAG, "We're already fetching it apparently.");
+        } else {
+            returnNetworkResponse(requestUuid, endPoint, getResult, errorResponse, service);
+        }
+    }
+
+    private void returnNetworkResponse(final String requestUuid, final String endPoint, final GetResult<ReturnResult, ServiceClass> getResult, final ErrorResponse errorResponse, final ServiceClass service) {
+        new AsyncTask<Void, Void, ReturnResult>() {
+            @Override
+            protected ReturnResult doInBackground(Void... params) {
+                // Now get from network
+                try {
+                    RequestQueue.addRequestUuid(requestUuid);
+                    Log.d(TAG, "Attempting to fetch result from base url: " + endPoint);
+                    ReturnResult res = getResult.getResult(service);
+                    if (res != null) {
+                        Log.d(TAG, "Fetched : " + res.toString() + " from " + endPoint);
+                    }
+                    return res;
+                } catch (RetrofitError e) {
+                    Log.d(TAG, "Caught a RetrofitError", e);
+                    if (e.getResponse() != null && errorResponse != null) {
+                        Log.d(TAG, "Filling error from response");
+                        errorResponse.fill(e.getResponse().getStatus(),
+                                e.getResponse().getReason(),
+                                e.getResponse().getUrl(),
+                                e.isNetworkError());
+                    } else {
+                        Log.d(TAG, "Not filling error from response - likely network down");
+                    }
+                    return null;
+                } catch (Exception e1) {
+                    Log.d(TAG, "Caught an Exception");
+                    Log.e(TAG, "Unknown error", e1);
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(ReturnResult res) {
+                Log.d(TAG, "onPostExecute()");
+                RequestQueue.removeUuid(requestUuid);
+                if (res != null) {
+                    Log.d(TAG, "onPostExecute(): Sending good result back");
+                    super.onPostExecute(res);
+                    Application.getEventBus().post(res);
+                } else if (res == null && errorResponse != null) {
+                    Log.d(TAG, "onPostExecute(): Sending an error back");
+                    Application.getEventBus().post(errorResponse);
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    private void returnCacheIfAvailable(final String endPoint, final CachedResponse<ReturnResult> cacheResponse, final String cachedResponseUri, final Class<? extends ReturnResult> returnType) {
         if(cachedResponseUri!=null) {
             new AsyncTask<Void, Void, ReturnResult>() {
                 @Override
@@ -99,55 +161,8 @@ public class MessageBusService<ReturnResult, ServiceClass> {
                         Log.d(TAG, "onPostExecute() No cached result to send back.");
                     }
                 }
-            }.execute();
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
-
-        // Call the service in an async task, sending the success or error to the event bus
-        new AsyncTask<Void, Void, ReturnResult>() {
-            @Override
-            protected ReturnResult doInBackground(Void... params) {
-                // Now get from network
-                try {
-                    Log.d(TAG, "Attempting to fetch result from base url: " + endPoint);
-                    ReturnResult res = getResult.getResult(service);
-                    if (res != null) {
-                        Log.d(TAG, "Fetched : " + res.toString() + " from " + endPoint);
-                    }
-                    return res;
-                } catch (RetrofitError e) {
-                    Log.d(TAG, "Caught a RetrofitError", e);
-                    if (e.isNetworkError()) {
-                    }
-                    if (e.getResponse() != null && errorResponse != null) {
-                        Log.d(TAG, "Filling error from response");
-                        errorResponse.fill(e.getResponse().getStatus(),
-                                e.getResponse().getReason(),
-                                e.getResponse().getUrl(),
-                                e.isNetworkError());
-                    } else {
-                        Log.d(TAG, "Not filling error from response - likely network down");
-                    }
-                    return null;
-                } catch (Exception e1) {
-                    Log.d(TAG, "Caught an Exception");
-                    Log.e(TAG, "Unknown error", e1);
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(ReturnResult res) {
-                Log.d(TAG, "onPostExecute()");
-                if (res != null) {
-                    Log.d(TAG, "onPostExecute(): Sending good result back");
-                    super.onPostExecute(res);
-                    Application.getEventBus().post(res);
-                } else if (res == null && errorResponse != null) {
-                    Log.d(TAG, "onPostExecute(): Sending an error back");
-                    Application.getEventBus().post(errorResponse);
-                }
-            }
-        }.execute();
     }
 
     private OkClient createHttpClient() {

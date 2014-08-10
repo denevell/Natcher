@@ -1,7 +1,7 @@
 package com.newfivefour.natcher.networking;
 
 import com.google.gson.Gson;
-import com.newfivefour.natcher.Application;
+import com.newfivefour.natcher.app.Application;
 import com.squareup.okhttp.internal.DiskLruCache;
 import com.squareup.okhttp.internal.Util;
 

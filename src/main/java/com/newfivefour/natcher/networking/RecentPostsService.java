@@ -1,5 +1,7 @@
 package com.newfivefour.natcher.networking;
 
+import android.support.v4.app.Fragment;
+
 import java.util.List;
 
 import retrofit.http.GET;
@@ -13,7 +15,7 @@ public class RecentPostsService {
         mService = new MessageBusService<RecentPosts, RecentPostsServiceInterface>();
     }
 
-    public void fetch() {
+    public void fetch(Fragment f) {
         String url = "https://android-manchester.co.uk/api/rest";
 
         mService.fetch(
@@ -27,6 +29,7 @@ public class RecentPostsService {
                 new RecentPostsError(),
                 new RecentPostsCached(),
                 "/post/0/10",
+                f.getArguments(),
                 RecentPosts.class
         );
     }

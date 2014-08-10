@@ -1,13 +1,15 @@
 package com.newfivefour.natcher;
 
+import com.newfivefour.natcher.app.Application;
+import com.newfivefour.natcher.app.Presenter;
 import com.newfivefour.natcher.networking.RecentPostsService;
 import com.squareup.otto.Subscribe;
 
 public class NatcherPresenter implements Presenter {
 
-    private final NatcherActivity mView;
+    private final NatcherFragment mView;
 
-    public NatcherPresenter(NatcherActivity natcherActivity) {
+    public NatcherPresenter(NatcherFragment natcherActivity) {
         mView = natcherActivity;
     }
 
@@ -15,7 +17,7 @@ public class NatcherPresenter implements Presenter {
     public void onResume() {
         Application.getEventBus().register(this);
         mView.startLoading(true);
-        new RecentPostsService().fetch();
+        new RecentPostsService().fetch(mView);
     }
 
     @Override
