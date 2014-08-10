@@ -18,6 +18,13 @@ import retrofit.client.OkClient;
 import retrofit.converter.Converter;
 import retrofit.converter.GsonConverter;
 
+/**
+ * Takes in a Retrofit service class and returns its result down the Otto event bus.
+ *
+ * Can perform response body caching, and waits for a unique request to complete before sending another.
+ * @param <ReturnResult>
+ * @param <ServiceClass>
+ */
 public class MessageBusService<ReturnResult, ServiceClass> {
 
     private static final String TAG = MessageBusService.class.getSimpleName();
@@ -39,35 +46,76 @@ public class MessageBusService<ReturnResult, ServiceClass> {
         }
     }
 
-    public void fetch(String endPoint,
-                      Class<ServiceClass> serviceClass,
-                      GetResult<ReturnResult, ServiceClass> getResult,
-                      ErrorResponse errorResponse,
-                      CachedResponse<ReturnResult> cacheResponse,
-                      String cacheResponseUri,
-                      Bundle bundleForRequestUuid,
-                      Class<? extends ReturnResult> returnType) {
-        fetch(endPoint,
-                serviceClass,
-                new GsonConverter(new Gson()),
-                getResult,
-                errorResponse,
-                cacheResponse,
-                cacheResponseUri,
-                bundleForRequestUuid,
-                returnType);
+    public static class Builder<ReturnResult, ServiceClass> {
+        private Converter converter = new GsonConverter(new Gson());
+        private CachedResponse<ReturnResult> cacheResponse;
+        private String cachedResponseUri;
+        private Bundle requestUuidBundle;
+
+        /**
+        * @param converter The Retrofit converter, GsonConverter normally and by default
+        */
+        public Builder converter(Converter converter) {
+            this.converter = converter;
+            return this;
+        }
+
+        /**
+         * If you want to send a cached response back down the event bus.
+         *
+         * OkHTTP does the response caching for us.
+         * @param requestUriMinusBase Used to find the cached response
+         * @param callback The object that will be sent back down the event bus
+         */
+        public Builder cacheRequest(String requestUriMinusBase, CachedResponse<ReturnResult> callback) {
+            this.cachedResponseUri = requestUriMinusBase;
+            this.cacheResponse = callback;
+            return this;
+        }
+
+        /**
+         * @param bundleWithUuid If the bundle contains a UUID that is being processed, a new request won't touch the network, but will
+         *               return the cache and wait for the request to finish.
+         *
+         *               Once the request is finished, the UUID will no longer match currently processing requests, and a new
+         *               request will again touch the network.
+         *
+         *               If there is no UUID in the bundle, we'll add one to it.
+         *
+         *               This is especially useful for Fragment.getArguments(), which persist on Fragment recreation.
+         */
+        public Builder requestUuidBundle(Bundle bundleWithUuid) {
+            this.requestUuidBundle = bundleWithUuid;
+            return this;
+        }
+
+        /**
+         * Fetches an object from an end point
+         *
+         * @param baseUrl      url
+         * @param serviceClass  Retrofit class
+         * @param errorResponse Object we'll send result of an error
+         * @param getResult     Callback that uses the retrofit class to grab the return value
+         */
+        public void fetch(String baseUrl,
+                     Class<ServiceClass> serviceClass,
+                     GetResult<ReturnResult, ServiceClass> getResult,
+                     ErrorResponse errorResponse,
+                     Class<? extends ReturnResult> returnType) {
+            MessageBusService<ReturnResult, ServiceClass> service = new MessageBusService<ReturnResult, ServiceClass>();
+            service.fetch(baseUrl,
+                    serviceClass,
+                    converter,
+                    getResult,
+                    errorResponse,
+                    cacheResponse,
+                    cachedResponseUri,
+                    requestUuidBundle,
+                    returnType);
+        }
     }
 
-    /**
-     * Fetches an object from an end point
-     *
-     * @param endPoint      url
-     * @param serviceClass  Retrofit class
-     * @param errorResponse Object we'll send result of an error
-     * @param converter     The Retrofit converter, GSON normally
-     * @param getResult     Callback that uses the retrofit class to grab the return value
-     */
-    public void fetch(final String endPoint,
+    private void fetch(final String baseUrl,
                       Class<ServiceClass> serviceClass,
                       Converter converter,
                       GetResult<ReturnResult, ServiceClass> getResult,
@@ -78,14 +126,14 @@ public class MessageBusService<ReturnResult, ServiceClass> {
                       Class<? extends ReturnResult> returnType) {
 
         OkClient ok = createHttpClient();
-        ServiceClass service = createServiceClass(endPoint, serviceClass, converter, ok);
-        returnCacheIfAvailable(endPoint, cacheResponse, cachedResponseUri, returnType);
+        ServiceClass service = createServiceClass(baseUrl, serviceClass, converter, ok);
+        returnCacheIfAvailable(baseUrl+cachedResponseUri, cacheResponse, returnType);
 
         String requestUuid = RequestQueue.getUuidFromBundle(requestUuidBundle);
         if(RequestQueue.isRequestUnderway(requestUuid)) {
             Log.d(TAG, "We're already fetching it apparently.");
         } else {
-            returnNetworkResponse(requestUuid, endPoint, getResult, errorResponse, service);
+            returnNetworkResponse(requestUuid, baseUrl, getResult, errorResponse, service);
         }
     }
 
@@ -129,7 +177,7 @@ public class MessageBusService<ReturnResult, ServiceClass> {
                     Log.d(TAG, "onPostExecute(): Sending good result back");
                     super.onPostExecute(res);
                     Application.getEventBus().post(res);
-                } else if (res == null && errorResponse != null) {
+                } else if (errorResponse != null) {
                     Log.d(TAG, "onPostExecute(): Sending an error back");
                     Application.getEventBus().post(errorResponse);
                 }
@@ -137,13 +185,14 @@ public class MessageBusService<ReturnResult, ServiceClass> {
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    private void returnCacheIfAvailable(final String endPoint, final CachedResponse<ReturnResult> cacheResponse, final String cachedResponseUri, final Class<? extends ReturnResult> returnType) {
-        if(cachedResponseUri!=null) {
+    private void returnCacheIfAvailable(final String fullCachedUrl, final CachedResponse<ReturnResult> cacheResponse, final Class<? extends ReturnResult> returnType) {
+        if(cacheResponse!=null) {
             new AsyncTask<Void, Void, ReturnResult>() {
                 @Override
                 protected ReturnResult doInBackground(Void... params) {
                     try {
-                        ReturnResult cached = ResponseCache.getObject(endPoint + cachedResponseUri, returnType);
+                        Log.d(TAG, "Attempting to send back cached version");
+                        ReturnResult cached = ResponseCache.getObject(fullCachedUrl, returnType);
                         Log.d(TAG, "Sending back cached version");
                         return cached;
                     } catch(Exception e) {

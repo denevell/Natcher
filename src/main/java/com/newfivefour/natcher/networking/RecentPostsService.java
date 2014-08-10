@@ -15,23 +15,24 @@ public class RecentPostsService {
         mService = new MessageBusService<RecentPosts, RecentPostsServiceInterface>();
     }
 
+    @SuppressWarnings("unchecked")
     public void fetch(Fragment f) {
-        String url = "https://android-manchester.co.uk/api/rest";
+        String baseUrl = "https://android-manchester.co.uk/api/rest";
 
-        mService.fetch(
-                url,
-                RecentPostsServiceInterface.class,
-                new MessageBusService.GetResult<RecentPosts, RecentPostsServiceInterface>() {
-                    @Override public RecentPosts getResult(RecentPostsServiceInterface service) throws Exception {
-                        return service.go(0, 10);
-                    }
-                },
-                new RecentPostsError(),
-                new RecentPostsCached(),
-                "/post/0/10",
-                f.getArguments(),
-                RecentPosts.class
-        );
+        new MessageBusService.Builder<RecentPosts, RecentPostsServiceInterface>()
+                .cacheRequest("/post/0/10", new RecentPostsCached())
+                .requestUuidBundle(f.getArguments())
+                .fetch(baseUrl,
+                        RecentPostsServiceInterface.class,
+                        new MessageBusService.GetResult<RecentPosts, RecentPostsServiceInterface>() {
+                            @Override
+                            public RecentPosts getResult(RecentPostsServiceInterface service) throws Exception {
+                                return service.go(0, 10);
+                            }
+                        },
+                        new RecentPostsError(),
+                        RecentPosts.class
+                );
     }
 
     public static interface RecentPostsServiceInterface {
