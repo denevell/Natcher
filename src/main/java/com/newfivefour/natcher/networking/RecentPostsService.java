@@ -57,12 +57,17 @@ public class RecentPostsService {
         public static class Post {
             private String content;
 
+            @Override
+            public String toString() {
+                return content;
+            }
+
             public String getContent() {
                 return content;
             }
 
             public void setContent(String content) {
-                this.content= content;
+                this.content = content;
             }
         }
     }

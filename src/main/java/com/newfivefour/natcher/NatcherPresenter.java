@@ -28,12 +28,12 @@ public class NatcherPresenter implements Presenter {
     @Subscribe
     public void recentPosts(RecentPostsService.RecentPosts posts) {
         mView.startLoading(false);
-        mView.setText(posts.getPosts().get(0).getContent());
+        mView.setPosts(posts);
     }
 
     @Subscribe
     public void recentPostsCached(RecentPostsService.RecentPostsCached cached) {
-        mView.setText("Cached: " + cached.returnCached().getPosts().get(0).getContent());
+        mView.setPosts(cached.returnCached());
     }
 
     @Subscribe

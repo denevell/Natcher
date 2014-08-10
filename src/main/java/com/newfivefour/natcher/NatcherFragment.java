@@ -5,13 +5,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import com.newfivefour.natcher.networking.RecentPostsService;
 
 
 public class NatcherFragment extends Fragment {
 
-    private TextView mTextView;
+    private ListView mListView;
     private NatcherPresenter mPresenter;
 
     @Override
@@ -24,7 +27,7 @@ public class NatcherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.natcher_fragment, container, false);
-        mTextView = (TextView) v.findViewById(R.id.textView);
+        mListView = (ListView) v.findViewById(R.id.listView);
         return v;
     }
 
@@ -40,8 +43,13 @@ public class NatcherFragment extends Fragment {
         mPresenter.onPause();
     }
 
-    public void setText(String text) {
-        mTextView.setText(text);
+    public void setPosts(RecentPostsService.RecentPosts recentPosts) {
+        ArrayAdapter adapter = new ArrayAdapter<RecentPostsService.RecentPosts.Post>(
+                getActivity(),
+                R.layout.post_list_item,
+                recentPosts.getPosts());
+        mListView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     public void setError(String s) {
