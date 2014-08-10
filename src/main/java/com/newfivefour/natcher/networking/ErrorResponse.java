@@ -1,5 +1,8 @@
 package com.newfivefour.natcher.networking;
 
+/**
+ * Extended to send custom errors down the event bus per request type.
+ */
 public class ErrorResponse {
     public int responseCode;
     public String responseMessage;

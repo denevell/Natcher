@@ -25,9 +25,9 @@ import retrofit.converter.GsonConverter;
  * @param <ReturnResult>
  * @param <ServiceClass>
  */
-public class MessageBusService<ReturnResult, ServiceClass> {
+public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
 
-    private static final String TAG = MessageBusService.class.getSimpleName();
+    private static final String TAG = NetworkingMessageBusService.class.getSimpleName();
     private static final int SIZE_OF_RESPONSE_CACHE = 10000 * 5;
 
     public static interface GetResult<ReturnResult, ServiceClass> {
@@ -102,7 +102,7 @@ public class MessageBusService<ReturnResult, ServiceClass> {
                      GetResult<ReturnResult, ServiceClass> getResult,
                      ErrorResponse errorResponse,
                      Class<? extends ReturnResult> returnType) {
-            MessageBusService<ReturnResult, ServiceClass> service = new MessageBusService<ReturnResult, ServiceClass>();
+            NetworkingMessageBusService<ReturnResult, ServiceClass> service = new NetworkingMessageBusService<ReturnResult, ServiceClass>();
             service.fetch(baseUrl,
                     serviceClass,
                     converter,

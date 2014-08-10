@@ -5,6 +5,13 @@ import android.os.Bundle;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+/**
+ * UUID strings added to the current fetches, and removed on completion.
+ *
+ * This means a request with a unique UUID won't be called until the previous one completed.
+ *
+ * Useful for ensuring the request doesn't start again on screen rotation, but waits instead.
+ */
 public class RequestQueue {
 
     private static CopyOnWriteArraySet<String> sCurrentFetches = new CopyOnWriteArraySet<String>();

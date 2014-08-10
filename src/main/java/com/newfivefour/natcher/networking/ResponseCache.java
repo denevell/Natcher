@@ -9,10 +9,14 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
+/**
+ * Gets the response body cache that OkHTTP set.
+ */
 public class ResponseCache {
     public static final int SIZE_OF_RESPONSE_CACHE = 10000 * 5;
 
     private static FilterInputStream getFromCache(String url) throws Exception {
+        // WARNING: The 201105 and 2 values come directly from the OkHTTP code - when they change, this should too.
         DiskLruCache cache = DiskLruCache.open(Application.getContext().getCacheDir(), 201105, 2, SIZE_OF_RESPONSE_CACHE);
         cache.flush();
         String key = Util.hash(url);

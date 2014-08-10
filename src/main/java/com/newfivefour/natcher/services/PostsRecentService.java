@@ -1,30 +1,33 @@
-package com.newfivefour.natcher.networking;
+package com.newfivefour.natcher.services;
 
 import android.support.v4.app.Fragment;
+
+import com.newfivefour.natcher.networking.ErrorResponse;
+import com.newfivefour.natcher.networking.NetworkingMessageBusService;
 
 import java.util.List;
 
 import retrofit.http.GET;
 import retrofit.http.Path;
 
-public class RecentPostsService {
+public class PostsRecentService {
 
-    private MessageBusService<RecentPosts, RecentPostsServiceInterface> mService;
+    private NetworkingMessageBusService<RecentPosts, RecentPostsServiceInterface> mService;
 
-    public RecentPostsService() {
-        mService = new MessageBusService<RecentPosts, RecentPostsServiceInterface>();
+    public PostsRecentService() {
+        mService = new NetworkingMessageBusService<RecentPosts, RecentPostsServiceInterface>();
     }
 
     @SuppressWarnings("unchecked")
     public void fetch(Fragment f) {
         String baseUrl = "https://android-manchester.co.uk/api/rest";
 
-        new MessageBusService.Builder<RecentPosts, RecentPostsServiceInterface>()
+        new NetworkingMessageBusService.Builder<RecentPosts, RecentPostsServiceInterface>()
                 .cacheRequest("/post/0/10", new RecentPostsCached())
                 .requestUuidBundle(f.getArguments())
                 .fetch(baseUrl,
                         RecentPostsServiceInterface.class,
-                        new MessageBusService.GetResult<RecentPosts, RecentPostsServiceInterface>() {
+                        new NetworkingMessageBusService.GetResult<RecentPosts, RecentPostsServiceInterface>() {
                             @Override
                             public RecentPosts getResult(RecentPostsServiceInterface service) throws Exception {
                                 return service.go(0, 10);
@@ -41,7 +44,7 @@ public class RecentPostsService {
     }
 
     public static class RecentPostsError extends ErrorResponse {}
-    public static class RecentPostsCached extends MessageBusService.CachedResponse<RecentPosts> {};
+    public static class RecentPostsCached extends NetworkingMessageBusService.CachedResponse<RecentPosts> {};
 
     public static class RecentPosts {
 

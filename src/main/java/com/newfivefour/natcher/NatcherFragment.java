@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.newfivefour.natcher.networking.RecentPostsService;
+import com.newfivefour.natcher.services.PostsRecentService;
 
 
 public class NatcherFragment extends Fragment {
@@ -43,8 +43,8 @@ public class NatcherFragment extends Fragment {
         mPresenter.onPause();
     }
 
-    public void setPosts(RecentPostsService.RecentPosts recentPosts) {
-        ArrayAdapter adapter = new ArrayAdapter<RecentPostsService.RecentPosts.Post>(
+    public void setPosts(PostsRecentService.RecentPosts recentPosts) {
+        ArrayAdapter adapter = new ArrayAdapter<PostsRecentService.RecentPosts.Post>(
                 getActivity(),
                 R.layout.post_list_item,
                 recentPosts.getPosts());
