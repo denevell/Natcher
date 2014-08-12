@@ -1,6 +1,7 @@
 package com.newfivefour.natcher.services;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.newfivefour.natcher.networking.ErrorResponse;
 import com.newfivefour.natcher.networking.NetworkingMessageBusService;
@@ -12,6 +13,7 @@ import retrofit.http.Path;
 
 public class PostsRecentService {
 
+    private static final String TAG = PostsRecentService.class.getSimpleName();
     private NetworkingMessageBusService<RecentPosts, RecentPostsServiceInterface> mService;
 
     public PostsRecentService() {
@@ -19,12 +21,15 @@ public class PostsRecentService {
     }
 
     @SuppressWarnings("unchecked")
-    public void fetch(Bundle f) {
+    public void fetch(Bundle f, boolean fetchCached) {
         String baseUrl = "https://android-manchester.co.uk/api/rest";
 
-        new NetworkingMessageBusService.Builder<RecentPosts, RecentPostsServiceInterface>()
-                .cacheRequest("/post/0/10", new RecentPostsCached())
-                .requestUuidBundle(f)
+        NetworkingMessageBusService.Builder builder =  new NetworkingMessageBusService.Builder<RecentPosts, RecentPostsServiceInterface>();
+        if(fetchCached) {
+            Log.d(TAG, "Fetching cached too");
+            builder.cacheRequest("/post/0/10", new RecentPostsCached());
+        }
+        builder.requestUuidBundle(f)
                 .fetch(baseUrl,
                         RecentPostsServiceInterface.class,
                         new NetworkingMessageBusService.GetResult<RecentPosts, RecentPostsServiceInterface>() {

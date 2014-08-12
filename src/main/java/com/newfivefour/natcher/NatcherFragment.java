@@ -1,6 +1,7 @@
 package com.newfivefour.natcher;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,12 +43,20 @@ public class NatcherFragment extends android.app.Fragment {
         mPresenter.onPause();
     }
 
+    public ListView getListView() {
+        return mListView;
+    }
+
     public void setPosts(PostsRecentService.RecentPosts recentPosts) {
         ArrayAdapter adapter = new ArrayAdapter<PostsRecentService.RecentPosts.Post>(
                 getActivity(),
                 R.layout.post_list_item,
                 recentPosts.getPosts());
+        Parcelable listInstance = mListView.onSaveInstanceState();
         mListView.setAdapter(adapter);
+        if(listInstance!=null) {
+            mListView.onRestoreInstanceState(listInstance);
+        }
         adapter.notifyDataSetChanged();
     }
 

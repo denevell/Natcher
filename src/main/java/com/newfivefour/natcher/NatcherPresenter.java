@@ -17,7 +17,8 @@ public class NatcherPresenter implements Presenter {
     public void onResume() {
         Application.getEventBus().register(this);
         mView.startLoading(true);
-        new PostsRecentService().fetch(mView.getArguments());
+        boolean fetchCached = mView.getListView().getAdapter()==null || mView.getListView().getAdapter().getCount()==0;
+        new PostsRecentService().fetch(mView.getArguments(), fetchCached);
     }
 
     @Override

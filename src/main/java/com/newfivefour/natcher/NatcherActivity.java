@@ -8,7 +8,7 @@ import android.view.Window;
 import android.widget.TextView;
 
 
-public class NatcherActivity extends FragmentActivity {
+public class NatcherActivity extends FragmentActivity implements SwipeInterface {
 
     private TextView mTextView;
     private Fragment natcherFragment = new NatcherFragment();
@@ -60,5 +60,25 @@ public class NatcherActivity extends FragmentActivity {
                 .addToBackStack(NatcherFragment.class.getSimpleName())
                 .replace(R.id.container, natcherFragment)
                 .commit();
+    }
+
+    @Override
+    public void bottom2top(View v) {
+
+    }
+
+    @Override
+    public void left2right(View v) {
+
+    }
+
+    @Override
+    public void right2left(View v) {
+
+    }
+
+    @Override
+    public void top2bottom(View v) {
+
     }
 }

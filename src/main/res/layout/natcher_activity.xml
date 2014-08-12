@@ -1,7 +1,12 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.newfivefour.natcher.TouchableRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    android:focusable="true"
+    android:clickable="true"
+    android:id="@+id/absolute_container"
     tools:context=".Natcher">
 
     <TextView
@@ -26,4 +31,4 @@
         android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true" />
 
-</RelativeLayout>
+</com.newfivefour.natcher.TouchableRelativeLayout>

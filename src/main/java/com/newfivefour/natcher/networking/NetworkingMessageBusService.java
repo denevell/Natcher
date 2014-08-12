@@ -133,11 +133,17 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
         if(RequestQueue.isRequestUnderway(requestUuid)) {
             Log.d(TAG, "We're already fetching it apparently.");
         } else {
-            returnNetworkResponse(requestUuid, baseUrl, getResult, errorResponse, service);
+            returnNetworkResponse(baseUrl, cachedResponseUri, requestUuid, getResult, errorResponse, service, returnType);
         }
     }
 
-    private void returnNetworkResponse(final String requestUuid, final String endPoint, final GetResult<ReturnResult, ServiceClass> getResult, final ErrorResponse errorResponse, final ServiceClass service) {
+    private void returnNetworkResponse(final String endPoint,
+                                       final String cachedResponseUri,
+                                       final String requestUuid,
+                                       final GetResult<ReturnResult, ServiceClass> getResult,
+                                       final ErrorResponse errorResponse,
+                                       final ServiceClass service,
+                                       final Class<? extends ReturnResult> returnType) {
         new AsyncTask<Void, Void, ReturnResult>() {
             @Override
             protected ReturnResult doInBackground(Void... params) {
@@ -146,6 +152,7 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                     RequestQueue.addRequestUuid(requestUuid);
                     Log.d(TAG, "Attempting to fetch result from base url: " + endPoint);
                     ReturnResult res = getResult.getResult(service);
+                    ResponseCache.put(endPoint+cachedResponseUri, res, returnType);
                     if (res != null) {
                         Log.d(TAG, "Fetched : " + res.toString() + " from " + endPoint);
                     }
@@ -182,15 +189,10 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                     Application.getEventBus().post(errorResponse);
                 }
             }
-        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void returnCacheIfAvailable(final String fullCachedUrl, final CachedResponse<ReturnResult> cacheResponse, final Class<? extends ReturnResult> returnType) {
-        ReturnResult cached = ResponseCache.getObject(fullCachedUrl, returnType);
-        if(cached!=null) {
-            Application.getEventBus().post(cacheResponse.setCache(cached));
-        }
-        /*
         if(cacheResponse!=null) {
             new AsyncTask<Void, Void, ReturnResult>() {
                 @Override
@@ -215,9 +217,8 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                         Log.d(TAG, "onPostExecute() No cached result to send back.");
                     }
                 }
-            }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
-        */
     }
 
     private OkClient createHttpClient() {

@@ -3,32 +3,44 @@ package com.newfivefour.natcher.networking;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.jakewharton.disklrucache.DiskLruCache;
 import com.newfivefour.natcher.app.Application;
-import com.squareup.okhttp.internal.DiskLruCache;
 import com.squareup.okhttp.internal.Util;
 
+import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Scanner;
 
 /**
- * Gets the response body cache that OkHTTP set.
+ * Caches the response objects.
+ *
+ * Doesn't use the OkHTTP cache, since if you use that, and get and put and object at the same time: goodbye cache.
+ *
+ * And since OkHTTP's cache object is 'final' you can extend it to synchronise access.
  */
 public class ResponseCache {
     public static final int SIZE_OF_RESPONSE_CACHE = 10000 * 5;
     private static final String TAG = ResponseCache.class.getSimpleName();
     private static DiskLruCache cache;
+    private static Object sSyncLock = new Object();
 
     private static FilterInputStream getFromCache(String url) throws Exception {
-        // WARNING: The 201105 and 2 values come directly from the OkHTTP code - when they change, this should too.
         if(cache==null) {
-            cache = DiskLruCache.open(Application.getContext().getCacheDir(), 201105, 2, SIZE_OF_RESPONSE_CACHE);
+            File filesDir = Application.getContext().getFilesDir();
+            String dir = filesDir.getAbsolutePath()+"/natcher_response_cache";
+            File cacheDir = new File(dir);
+            cacheDir.mkdirs();
+            cache = DiskLruCache.open(cacheDir, 201105, 1, SIZE_OF_RESPONSE_CACHE);
         }
-        //cache.flush();
+        cache.flush();
         String key = Util.hash(url);
         final DiskLruCache.Snapshot snapshot;
         try {
-            snapshot = cache.get(key);
+            synchronized (sSyncLock) {
+                snapshot = cache.get(key);
+            }
             if (snapshot == null) {
                 return null;
             }
@@ -37,7 +49,7 @@ public class ResponseCache {
             return null;
         }
 
-        FilterInputStream bodyIn = new FilterInputStream(snapshot.getInputStream(1)) {
+        FilterInputStream bodyIn = new FilterInputStream(snapshot.getInputStream(0)) {
             @Override
             public void close() throws IOException {
                 snapshot.close();
@@ -66,8 +78,31 @@ public class ResponseCache {
             T t = new Gson().fromJson(str, type);
             return t;
         } catch(Exception e) {
-            e.printStackTrace();
+            Log.d(TAG, "Error getting object", e);
             return null;
+        }
+    }
+
+   public static <T> void put(String fullUrl, T ob, Class<? extends T> typeClass) throws IOException {
+        DiskLruCache.Editor editor = null;
+        try {
+            synchronized (sSyncLock) {
+                editor = cache.edit(Util.hash(fullUrl));
+                if (editor == null) {
+                    Log.d(TAG, "Editor was null on adding to cache");
+                    return;
+                }
+                OutputStream bos = editor.newOutputStream(0);
+                String s = new Gson().toJson(ob, typeClass);
+                bos.write(s.getBytes());
+                bos.flush();
+            }
+        } catch (IOException e) {
+            Log.d(TAG, "Exception while adding to cache", e);
+        } finally {
+            if(editor!=null) {
+                editor.commit();
+            }
         }
     }
 }

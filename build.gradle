@@ -23,6 +23,7 @@ dependencies {
         compile 'com.squareup.okhttp:okhttp:2.0.0'
         compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
         compile 'com.squareup:otto:1.3.4'
+        compile 'com.jakewharton:disklrucache:2.0.2'
 }
 
 android {
