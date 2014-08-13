@@ -33,7 +33,7 @@ public class RecentPostsView extends FrameLayout implements
 
     @Override
     public void populateFromCache(PostsRecentService.RecentPosts ob) {
-        populateFromServer(ob);
+        populateListView(ob);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class RecentPostsView extends FrameLayout implements
     }
 
     private void populateListView(PostsRecentService.RecentPosts ob) {
-        ArrayAdapter adapter = new ArrayAdapter(
+        ArrayAdapter<PostsRecentService.RecentPosts.Post> adapter = new ArrayAdapter<>(
                 getContext(),
                 R.layout.post_list_item,
                 ob.getPosts());
