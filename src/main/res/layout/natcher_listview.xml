@@ -5,8 +5,8 @@
     android:background="@android:color/holo_green_light"
     tools:context=".Natcher">
 
-    <com.newfivefour.natcher.screens.recentposts.RecentPostsView
-        android:id="@+id/natcher_listview"
+    <ListView
+        android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />

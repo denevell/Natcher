@@ -1,4 +1,4 @@
-package com.newfivefour.natcher;
+package com.newfivefour.natcher.app.swiping;
 
 import android.content.Context;
 import android.util.AttributeSet;

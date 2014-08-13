@@ -1,4 +1,4 @@
-package com.newfivefour.natcher;
+package com.newfivefour.natcher.screens.recentposts;
 
 import com.newfivefour.natcher.app.Application;
 import com.newfivefour.natcher.app.Presenter;
@@ -16,9 +16,7 @@ public class NatcherPresenter implements Presenter {
     @Override
     public void onResume() {
         Application.getEventBus().register(this);
-        mView.startLoading(true);
-        boolean fetchCached = mView.getListView().getAdapter()==null || mView.getListView().getAdapter().getCount()==0;
-        new PostsRecentService().fetch(mView.getArguments(), fetchCached);
+        new PostsRecentService().fetch(mView.getArguments(), true);
     }
 
     @Override
@@ -28,18 +26,16 @@ public class NatcherPresenter implements Presenter {
 
     @Subscribe
     public void recentPosts(PostsRecentService.RecentPosts posts) {
-        mView.startLoading(false);
-        mView.setPosts(posts);
+        mView.setRecentPosts(posts);
     }
 
     @Subscribe
     public void recentPostsCached(PostsRecentService.RecentPostsCached cached) {
-        mView.setPosts(cached.returnCached());
+        mView.setRecentPostsFromCache(cached.returnCached());
     }
 
     @Subscribe
     public void recentPostsError(PostsRecentService.RecentPostsError error) {
-        mView.startLoading(false);
-        mView.setError("Network error");
+        mView.setRecentPostsError("Network error");
     }
 }

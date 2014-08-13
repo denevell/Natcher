@@ -1,4 +1,4 @@
-package com.newfivefour.natcher;
+package com.newfivefour.natcher.app.swiping;
 
 import android.view.View;
 

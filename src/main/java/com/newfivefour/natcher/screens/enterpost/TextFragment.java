@@ -1,9 +1,11 @@
-package com.newfivefour.natcher;
+package com.newfivefour.natcher.screens.enterpost;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.newfivefour.natcher.R;
 
 
 public class TextFragment extends android.app.Fragment {

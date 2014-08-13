@@ -1,7 +1,6 @@
 package com.newfivefour.natcher.services;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.newfivefour.natcher.networking.ErrorResponse;
 import com.newfivefour.natcher.networking.NetworkingMessageBusService;
@@ -16,31 +15,27 @@ public class PostsRecentService {
     private static final String TAG = PostsRecentService.class.getSimpleName();
     private NetworkingMessageBusService<RecentPosts, RecentPostsServiceInterface> mService;
 
-    public PostsRecentService() {
-        mService = new NetworkingMessageBusService<RecentPosts, RecentPostsServiceInterface>();
-    }
-
     @SuppressWarnings("unchecked")
-    public void fetch(Bundle f, boolean fetchCached) {
+    public void fetch(Bundle f) {
         String baseUrl = "https://android-manchester.co.uk/api/rest";
 
-        NetworkingMessageBusService.Builder builder =  new NetworkingMessageBusService.Builder<RecentPosts, RecentPostsServiceInterface>();
-        if(fetchCached) {
-            Log.d(TAG, "Fetching cached too");
-            builder.cacheRequest("/post/0/10", new RecentPostsCached());
-        }
-        builder.requestUuidBundle(f)
+        new NetworkingMessageBusService.Builder<RecentPosts, RecentPostsServiceInterface>()
+                .dontRerequestExistingRequest(f)
+                .cacheRequest("/post/0/10", new RecentPostsCached())
                 .fetch(baseUrl,
                         RecentPostsServiceInterface.class,
                         new NetworkingMessageBusService.GetResult<RecentPosts, RecentPostsServiceInterface>() {
-                            @Override
-                            public RecentPosts getResult(RecentPostsServiceInterface service) throws Exception {
+                            @Override public RecentPosts getResult(RecentPostsServiceInterface service) throws Exception {
                                 return service.go(0, 10);
                             }
                         },
                         new RecentPostsError(),
                         RecentPosts.class
                 );
+    }
+
+    public PostsRecentService() {
+        mService = new NetworkingMessageBusService<RecentPosts, RecentPostsServiceInterface>();
     }
 
     public static interface RecentPostsServiceInterface {
@@ -50,7 +45,6 @@ public class PostsRecentService {
 
     public static class RecentPostsError extends ErrorResponse {}
     public static class RecentPostsCached extends NetworkingMessageBusService.CachedResponse<RecentPosts> {};
-
     public static class RecentPosts {
 
         private List<Post> posts;

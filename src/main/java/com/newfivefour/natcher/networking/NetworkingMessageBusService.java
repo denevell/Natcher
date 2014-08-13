@@ -84,7 +84,7 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
          *
          *               This is especially useful for Fragment.getArguments(), which persist on Fragment recreation.
          */
-        public Builder requestUuidBundle(Bundle bundleWithUuid) {
+        public Builder dontRerequestExistingRequest(Bundle bundleWithUuid) {
             this.requestUuidBundle = bundleWithUuid;
             return this;
         }
@@ -152,7 +152,9 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                     RequestQueue.addRequestUuid(requestUuid);
                     Log.d(TAG, "Attempting to fetch result from base url: " + endPoint);
                     ReturnResult res = getResult.getResult(service);
-                    ResponseCache.put(endPoint+cachedResponseUri, res, returnType);
+                    if(cachedResponseUri!=null) {
+                        ResponseCache.put(endPoint+cachedResponseUri, res, returnType);
+                    }
                     if (res != null) {
                         Log.d(TAG, "Fetched : " + res.toString() + " from " + endPoint);
                     }

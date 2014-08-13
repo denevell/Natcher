@@ -7,6 +7,10 @@ import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
+import com.newfivefour.natcher.app.swiping.SwipeInterface;
+import com.newfivefour.natcher.screens.enterpost.TextFragment;
+import com.newfivefour.natcher.screens.recentposts.NatcherFragment;
+
 
 public class NatcherActivity extends FragmentActivity implements SwipeInterface {
 
@@ -17,7 +21,7 @@ public class NatcherActivity extends FragmentActivity implements SwipeInterface 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_PROGRESS);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.natcher_activity);
 
         natcherFragment.setArguments(new Bundle());
