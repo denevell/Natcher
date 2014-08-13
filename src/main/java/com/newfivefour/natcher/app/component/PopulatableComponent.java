@@ -2,30 +2,39 @@ package com.newfivefour.natcher.app.component;
 
 
 /**
- * 1. Component removes in-component loading on cache
- * Given the component has no content
- * Given a fetch starts and cache is returned
- * Then the component should show the loading display
- * And then the component remove its loading display on receiving the cache
+ * In-component loader display
+ * ###########################
  *
- * 2. Component removes in-component on loading server data
- * Given the component has no content
- * Given there is no cached content to show
- * Given a fetch starts
- * Then the component should show the loading display
- * And then remove the loading display on receiving good data from server
+ * Given the component has started
+ * Then show the in-component loading display
  *
- * 3. Component keeps overall loading display on cached content
- * Given cached content is given to the component
- * Then the loading display should is removed
- * But the the overall page loading display should remain
+ * Given the component has been given cached content
+ * Then remove the in-component loading display
  *
- * 4. Component removes overall page loading display on server content
- * Given the component has a reference to the overall page loading display
- * Given the server returns good content
- * Then the overall page loading display should be removed
+ * Given the component has been given server content
+ * Then remove the in-component loading display
  *
- * 5. On empty server content, component loading should disappear
+ * Given the component has received a server error
+ * Then remove the in-component loading display
+ *
+ * Overall page-loader display
+ * ###########################
+ *
+ * # Given the component's overall page-loader is set
+ * Then the component should start the overall page-loader
+ *
+ * # Given cached content is given to the component
+ * Then the overall page loading display should remain
+ *
+ * # Given the server returns good content
+ * Then the overall page loading display should be removed if it's set
+ *
+ * # Given the component has received a server error
+ * Then the overall page loading display should be removed if it's set
+ *
+ * ### Is empty stuff
+ *
+ * 5. On empty server content, component loading should disappear and empty display should appear
  * Given component's isEmpty method is called
  * Then the component loading display is removed
  * Then the overall page loading is removed if there
@@ -36,6 +45,8 @@ package com.newfivefour.natcher.app.component;
  * Given the populateFromServerError has been called
  * Then show an error in the component
  * And remove overall and component loading if there
+ *
+ * ## Is server error stuff
  *
  * 7. On server error, with cached content, show overall page error
  * Given there's cached content
