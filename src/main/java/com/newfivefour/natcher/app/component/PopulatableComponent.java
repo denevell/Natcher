@@ -5,32 +5,39 @@ package com.newfivefour.natcher.app.component;
  * In-component loader display
  * ###########################
  *
- * Given the component has started
+ * # Given the component has started
  * Then show the in-component loading display
  *
- * Given the component has been given cached content
+ * # Given the component has been given cached content
  * Then remove the in-component loading display
  *
- * Given the component has been given server content
+ * # Given the component has been given server content
  * Then remove the in-component loading display
  *
- * Given the component has received a server error
+ * # Given the component has received a server error
+ * Then remove the in-component loading display
+ *
+ * # Given the component has empty content
  * Then remove the in-component loading display
  *
  * Overall page-loader display
  * ###########################
  *
- * # Given the component's overall page-loader is set
- * Then the component should start the overall page-loader
- *
  * # Given cached content is given to the component
- * Then the overall page loading display should remain
+ * Given the network response hasn't returned
+ * Then the overall page loading display should be set active
  *
  * # Given the server returns good content
  * Then the overall page loading display should be removed if it's set
  *
  * # Given the component has received a server error
+ *
  * Then the overall page loading display should be removed if it's set
+ *
+ * # Given the component has empty content
+ * Then the overall page loading display should be removed if it's set
+ *
+ * ### No cache and server error
  *
  * ### Is empty stuff
  *
@@ -46,13 +53,6 @@ package com.newfivefour.natcher.app.component;
  * Then show an error in the component
  * And remove overall and component loading if there
  *
- * ## Is server error stuff
- *
- * 7. On server error, with cached content, show overall page error
- * Given there's cached content
- * Given there's a server error call
- * Then the overall page error method should be called
- * And remove overall and component loading if there
  */
 public interface PopulatableComponent<T> {
     public void populateFromCache(T ob);

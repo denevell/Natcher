@@ -37,7 +37,7 @@ public class NatcherFragment extends android.app.Fragment
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.natcher_fragment, container, false);
         mRecentPostsView = (RecentPostsView) v.findViewById(R.id.natcher_listview);
-        mRecentPostsView.setOverallPageLoadingConnector(this);
+        mRecentPostsView.setPageWideLoadingConnector(this);
         return v;
     }
 

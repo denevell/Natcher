@@ -8,22 +8,26 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
+import com.newfivefour.natcher.LoadingWidget;
+import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.app.component.LoadingComponent;
 import com.newfivefour.natcher.app.component.ParentLoadingConnector;
 import com.newfivefour.natcher.app.component.PopulatableComponent;
-import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.services.PostsRecentService;
 
 public class RecentPostsView extends FrameLayout implements
         PopulatableComponent<PostsRecentService.RecentPosts>,
         ParentLoadingConnector {
 
+    private final LoadingWidget mInComponentLoadingWidget;
     private ListView mListView;
-    private LoadingComponent mOverallLoadingConnector;
+    private LoadingComponent mPageWideLoadingConnector;
+    private boolean mHasSetFromServer;
 
     public RecentPostsView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         LayoutInflater.from(context).inflate(R.layout.natcher_listview, this, true);
+        mInComponentLoadingWidget = new LoadingWidget(this);
         mListView = (ListView) findViewById(R.id.listView);
     }
 
@@ -34,22 +38,30 @@ public class RecentPostsView extends FrameLayout implements
     @Override
     public void populateFromCache(PostsRecentService.RecentPosts ob) {
         populateListView(ob);
+        setDisabledInComponentLoading();
+        if(!mHasSetFromServer && mPageWideLoadingConnector !=null) {
+            mPageWideLoadingConnector.loadingStart();
+        }
     }
 
     @Override
     public void populateFromServer(PostsRecentService.RecentPosts ob) {
         populateListView(ob);
-        stopOverLoadingConnector();
+        setDisabledPageWideLoading();
+        setDisabledInComponentLoading();
+        mHasSetFromServer = true;
     }
 
     @Override
     public void populateFromServerError() {
-        stopOverLoadingConnector();
+        setDisabledPageWideLoading();
+        setDisabledInComponentLoading();
     }
 
     @Override
     public void isEmpty() {
-
+        setDisabledPageWideLoading();
+        setDisabledInComponentLoading();
     }
 
     private void populateListView(PostsRecentService.RecentPosts ob) {
@@ -66,16 +78,19 @@ public class RecentPostsView extends FrameLayout implements
     }
 
     @Override
-    public void setOverallPageLoadingConnector(LoadingComponent loadingComponent) {
-        mOverallLoadingConnector = loadingComponent;
-        if(mOverallLoadingConnector !=null) {
-            mOverallLoadingConnector.loadingStart();
+    public void setPageWideLoadingConnector(LoadingComponent loadingComponent) {
+        mPageWideLoadingConnector = loadingComponent;
+    }
+
+    private void setDisabledPageWideLoading() {
+        if(mPageWideLoadingConnector !=null) {
+            mPageWideLoadingConnector.loadingStop();
         }
     }
 
-    private void stopOverLoadingConnector() {
-        if(mOverallLoadingConnector !=null) {
-            mOverallLoadingConnector.loadingStop();
+    private void setDisabledInComponentLoading() {
+        if(mInComponentLoadingWidget!=null) {
+            mInComponentLoadingWidget.hide();
         }
     }
 }
