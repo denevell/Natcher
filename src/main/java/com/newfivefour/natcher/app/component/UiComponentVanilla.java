@@ -1,5 +1,6 @@
 package com.newfivefour.natcher.app.component;
 
+import android.util.Log;
 import android.view.ViewGroup;
 
 import com.newfivefour.natcher.customviews.LoadingErrorEmptyWidget;
@@ -126,6 +127,7 @@ public class UiComponentVanilla<T> implements UIComponent<T> {
     private LoadingComponent mPageWideLoader;
     private boolean mPageWideLoadingStarted;
     private boolean mHasDataFromService;
+    private static String TAG = UiComponentVanilla.class.getSimpleName();
 
     public UiComponentVanilla(
             Populatable<T> populatable,
@@ -144,6 +146,7 @@ public class UiComponentVanilla<T> implements UIComponent<T> {
 
     @Override
     public void setEmptyConnector(EmptiableComponent connector) {
+        Log.d(TAG, "setEmptyConnector()");
         if(mInComponentLoadingErrorWidget!=null) {
             mInComponentLoadingErrorWidget.setEmptyConnector(connector);
         }
@@ -151,6 +154,7 @@ public class UiComponentVanilla<T> implements UIComponent<T> {
 
     @Override
     public void setRefreshConnector(RefreshableComponent connector) {
+        Log.d(TAG, "setRefreshConnector()");
         if(mInComponentLoadingErrorWidget!=null) {
             mInComponentLoadingErrorWidget.setRefreshConnector(connector);
         }
@@ -158,11 +162,13 @@ public class UiComponentVanilla<T> implements UIComponent<T> {
 
     @Override
     public void setPageWideLoadingConnector(LoadingComponent loadingComponent) {
+        Log.d(TAG, "setPageWideLoadingConnector()");
         mPageWideLoader = loadingComponent;
     }
 
     @Override
     public void populateStarting() {
+        Log.d(TAG, "populateStarting()");
         mHasDataFromService = false;
         setEmptyError(false);
         setServerError(false);
@@ -175,17 +181,21 @@ public class UiComponentVanilla<T> implements UIComponent<T> {
 
     @Override
     public void populateFromCache(T ob) {
+        Log.d(TAG, "populateFromCache()");
         mPopulatable.populate(ob);
         setLoading(false);
         setServerError(false);
         setEmptyError(false);
         if(!mHasDataFromService) {
+            Log.d(TAG, "populateFromCache(): setPageWideLoading");
             setPageWideLoading(true);
         }
     }
 
     @Override
     public void populateFromServer(T ob) {
+        Log.d(TAG, "populateFromServer()");
+        mHasDataFromService = true;
         mPopulatable.populate(ob);
         setPageWideLoading(false);
         setLoading(false);
@@ -195,9 +205,13 @@ public class UiComponentVanilla<T> implements UIComponent<T> {
 
     @Override
     public void populateFromServerError() {
+        Log.d(TAG, "populateFromServerError()");
+        mHasDataFromService = true;
         if(mPopulatable.hasEmptyContent()) {
+            Log.d(TAG, "populateFromServerError(): empty view content");
             setServerError(true);
         } else {
+            Log.d(TAG, "populateFromServerError(): non empty view content");
             setServerError(false);
         }
         setPageWideLoading(false);
@@ -207,6 +221,7 @@ public class UiComponentVanilla<T> implements UIComponent<T> {
 
     @Override
     public void populateWithEmptyContentFromServer() {
+        Log.d(TAG, "populateWithEmptyContentFromServer()");
         mPopulatable.clearExistingContent();
         setPageWideLoading(false);
         setLoading(false);
@@ -216,6 +231,7 @@ public class UiComponentVanilla<T> implements UIComponent<T> {
 
     @Override
     public void populateWithEmptyContentFromCache() {
+        Log.d(TAG, "populateWithEmptyContentFromCache()");
         mPopulatable.clearExistingContent();
         setLoading(false);
         setServerError(false);
