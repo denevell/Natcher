@@ -1,4 +1,4 @@
-package com.newfivefour.natcher.app.component;
+package com.newfivefour.natcher.uicomponent;
 
 public interface LoadingComponent {
     void loadingStart(boolean start);

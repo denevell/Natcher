@@ -1,4 +1,4 @@
-package com.newfivefour.natcher.app.component;
+package com.newfivefour.natcher.uicomponent;
 
 /**
  * This is so your view can implement all the goodness of ui components,

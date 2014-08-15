@@ -1,4 +1,4 @@
-package com.newfivefour.natcher.customviews;
+package com.newfivefour.natcher.uicomponent;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -6,18 +6,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.newfivefour.natcher.app.component.EmptiableComponent;
-import com.newfivefour.natcher.app.component.EmptiableContentConnector;
-import com.newfivefour.natcher.app.component.RefreshableComponent;
-import com.newfivefour.natcher.app.component.RefreshableContentConnector;
-
 public class LoadingErrorEmptyWidget implements
         RefreshableContentConnector,
         EmptiableContentConnector {
     private final View mError;
     private final View mEmpty;
     private View mLoading;
-    private RefreshableComponent mRefreshCallback;
 
     public LoadingErrorEmptyWidget(ViewGroup view,
                                    int loadingLayout,
@@ -75,10 +69,10 @@ public class LoadingErrorEmptyWidget implements
     @Override
     public void setRefreshConnector(final RefreshableComponent connector) {
         if(connector==null) return;
-        if(mError!=null && mError instanceof RefreshableContentConnector) {
+        if(mError instanceof RefreshableContentConnector) {
             ((RefreshableContentConnector)mError).setRefreshConnector(connector);
         }
-        if(mEmpty!=null && mEmpty instanceof RefreshableContentConnector) {
+        if(mEmpty instanceof RefreshableContentConnector) {
             ((RefreshableContentConnector)mEmpty).setRefreshConnector(connector);
         }
     }
@@ -86,7 +80,7 @@ public class LoadingErrorEmptyWidget implements
     @Override
     public void setEmptyConnector(EmptiableComponent connector) {
         if(connector==null) return;
-        if(mEmpty !=null && mEmpty instanceof EmptiableContentConnector) {
+        if(mEmpty instanceof EmptiableContentConnector) {
             ((EmptiableContentConnector)mEmpty).setEmptyConnector(connector);
         }
     }

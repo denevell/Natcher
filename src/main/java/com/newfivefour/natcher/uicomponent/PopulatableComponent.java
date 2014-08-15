@@ -1,4 +1,4 @@
-package com.newfivefour.natcher.app.component;
+package com.newfivefour.natcher.uicomponent;
 
 /**
  * Used to define what happens when populating a component,
@@ -6,7 +6,7 @@ package com.newfivefour.natcher.app.component;
  * when it has empty content from cache what should be loading, etc, etc.
  *
  * Used as part of the UiComponent
- * @see com.newfivefour.natcher.app.component.UiComponent
+ * @see com.newfivefour.natcher.uicomponent.UiComponent
  */
 public interface PopulatableComponent<T> {
     void populateStarting();

@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.newfivefour.natcher.R;
-import com.newfivefour.natcher.app.component.RefreshableComponent;
-import com.newfivefour.natcher.app.component.RefreshableContentConnector;
+import com.newfivefour.natcher.uicomponent.RefreshableComponent;
+import com.newfivefour.natcher.uicomponent.RefreshableContentConnector;
 
 public class ErrorViewGeneric extends FrameLayout implements RefreshableContentConnector {
 

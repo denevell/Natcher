@@ -1,4 +1,4 @@
-package com.newfivefour.natcher.app.component;
+package com.newfivefour.natcher.uicomponent;
 
 public interface RefreshableContentConnector {
     void setRefreshConnector(RefreshableComponent connector);

@@ -1,8 +1,5 @@
-package com.newfivefour.natcher.app.component;
+package com.newfivefour.natcher.uicomponent;
 
-/**
- * Created by user on 13/08/14.
- */
 public interface ParentLoadingConnector {
     void setPageWideLoadingConnector(LoadingComponent loadingComponent);
 }

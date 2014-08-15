@@ -9,11 +9,11 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.newfivefour.natcher.R;
-import com.newfivefour.natcher.app.component.Populatable;
-import com.newfivefour.natcher.app.component.UiComponent;
-import com.newfivefour.natcher.app.component.UiComponentDelegate;
-import com.newfivefour.natcher.app.component.UiComponentVanilla;
-import com.newfivefour.natcher.customviews.LoadingErrorEmptyWidget;
+import com.newfivefour.natcher.uicomponent.Populatable;
+import com.newfivefour.natcher.uicomponent.UiComponent;
+import com.newfivefour.natcher.uicomponent.UiComponentDelegate;
+import com.newfivefour.natcher.uicomponent.UiComponentVanilla;
+import com.newfivefour.natcher.uicomponent.LoadingErrorEmptyWidget;
 import com.newfivefour.natcher.services.PostsRecentService;
 
 public class RecentPostsView extends FrameLayout implements

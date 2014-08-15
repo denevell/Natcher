@@ -1,9 +1,7 @@
-package com.newfivefour.natcher.app.component;
+package com.newfivefour.natcher.uicomponent;
 
 import android.util.Log;
 import android.view.ViewGroup;
-
-import com.newfivefour.natcher.customviews.LoadingErrorEmptyWidget;
 
 /**
  * Allows your component to enjoy all the goodness of a UiComponent

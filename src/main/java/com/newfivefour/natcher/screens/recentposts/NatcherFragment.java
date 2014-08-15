@@ -7,10 +7,10 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.newfivefour.natcher.app.WindowLoadingSpinner;
-import com.newfivefour.natcher.app.component.EmptiableComponent;
-import com.newfivefour.natcher.app.component.LoadingComponent;
+import com.newfivefour.natcher.uicomponent.EmptiableComponent;
+import com.newfivefour.natcher.uicomponent.LoadingComponent;
 import com.newfivefour.natcher.R;
-import com.newfivefour.natcher.app.component.RefreshableComponent;
+import com.newfivefour.natcher.uicomponent.RefreshableComponent;
 import com.newfivefour.natcher.services.PostsRecentService;
 
 public class NatcherFragment extends android.app.Fragment

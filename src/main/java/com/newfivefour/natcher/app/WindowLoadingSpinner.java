@@ -3,9 +3,7 @@ package com.newfivefour.natcher.app;
 import android.app.Activity;
 import android.util.Log;
 
-import com.newfivefour.natcher.app.component.LoadingComponent;
-
-public class WindowLoadingSpinner implements LoadingComponent {
+public class WindowLoadingSpinner implements com.newfivefour.natcher.uicomponent.LoadingComponent {
 
     private static final String TAG = WindowLoadingSpinner.class.getSimpleName();
     private final Activity mActivity;
