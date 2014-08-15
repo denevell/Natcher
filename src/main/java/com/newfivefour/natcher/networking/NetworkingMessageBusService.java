@@ -21,9 +21,13 @@ import retrofit.converter.GsonConverter;
 /**
  * Takes in a Retrofit service class and returns its result down the Otto event bus.
  *
- * Can perform response body caching, and waits for a unique request to complete before sending another.
- * @param <ReturnResult>
- * @param <ServiceClass>
+ * Can perform
+ * 1. Response body caching,
+ * 2. Waits for a unique request to complete before sending another,
+ * 4. Sending events on error from server
+ * 5. Sending events on cache from server
+ * 6. Sending events on empty content from server
+ * 7. Returning cached responses if Etags or the like are used.
  */
 public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
 
