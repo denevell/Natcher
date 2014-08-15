@@ -5,8 +5,11 @@ import android.view.ViewGroup;
 
 import com.newfivefour.natcher.customviews.LoadingErrorEmptyWidget;
 
-
 /**
+ * Allows your component to enjoy all the goodness of a UiComponent
+ * i.e. dealing with loading views, error views, empty views, cached content,
+ * overall loading view, refreshing from server error, actions on empty content,
+ *
  * In-component loader display
  * ###########################
  *
@@ -26,10 +29,10 @@ import com.newfivefour.natcher.customviews.LoadingErrorEmptyWidget;
  * # Given the component has empty content
  * Then remove the in-component loading display
  *
- * Given we have received empty content from server
+ * # Given we have received empty content from server
  * Then remove the in-component loading display
  *
- * Given we have received empty content from cache
+ * # Given we have received empty content from cache
  * Then remove the in-component loading display
  *
  * Overall page-loader display
@@ -44,16 +47,16 @@ import com.newfivefour.natcher.customviews.LoadingErrorEmptyWidget;
  * Then show the overall page loader
  *
  * # Given the server returns good content
- * Then the overall page loading display should be removed if it's set
+ * Then the overall page loading display should be removed
  *
  * # Given the component has received a server error
- * Then the overall page loading display should be removed if it's set
+ * Then the overall page loading display should be removed
  *
- * Given we have received empty content from server
- * Then hide the server error
+ * # Given we have received empty content from server
+ * Then the overall page loading display should be removed
  *
- * Given we have received empty content from cache
- * Then don't hide the server error
+ * # Given we have received empty content from cache
+ * Then the overall page loading display should NOT be removed
  *
  * Server error
  * ############
@@ -121,7 +124,7 @@ import com.newfivefour.natcher.customviews.LoadingErrorEmptyWidget;
  * ### QUESTION: Calling the populateStarting before first one can get to populated by server, server error, or is empty
  * ### QUESTION: What if we want to refresh to component when it already has data?
  */
-public class UiComponentVanilla<T> implements UIComponent<T> {
+public class UiComponentVanilla<T> implements UiComponent<T> {
     private final Populatable<T> mPopulatable;
     private LoadingErrorEmptyWidget mInComponentLoadingErrorWidget;
     private LoadingComponent mPageWideLoader;

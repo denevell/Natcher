@@ -39,19 +39,19 @@ public class NatcherFragment extends android.app.Fragment
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.natcher_fragment, container, false);
         mRecentPostsView = (RecentPostsView) v.findViewById(R.id.natcher_listview);
-        mRecentPostsView.getUIComponentDelegate().setRefreshConnector(new RefreshableComponent() {
+        mRecentPostsView.getUiComponentDelegate().setRefreshConnector(new RefreshableComponent() {
             @Override
             public void onRefreshContent() {
                 mPresenter.recentPostsFetch();
             }
         });
-        mRecentPostsView.getUIComponentDelegate().setEmptyConnector(new EmptiableComponent() {
+        mRecentPostsView.getUiComponentDelegate().setEmptyConnector(new EmptiableComponent() {
             @Override
             public void onIsEmpty() {
                 Toast.makeText(getActivity(), "Yeah, it's empty.", Toast.LENGTH_LONG).show();
             }
         });
-        mRecentPostsView.getUIComponentDelegate().setPageWideLoadingConnector(this);
+        mRecentPostsView.getUiComponentDelegate().setPageWideLoadingConnector(this);
         return v;
     }
 
@@ -68,27 +68,27 @@ public class NatcherFragment extends android.app.Fragment
     }
 
     public void setRecentPostsLoadingStart() {
-        mRecentPostsView.getUIComponentDelegate().populateStarting();
+        mRecentPostsView.getUiComponentDelegate().populateStarting();
     }
 
     public void setRecentPosts(PostsRecentService.RecentPosts recentPosts) {
-        mRecentPostsView.getUIComponentDelegate().populateFromServer(recentPosts);
+        mRecentPostsView.getUiComponentDelegate().populateFromServer(recentPosts);
     }
 
     public void setRecentPostsFromCache(PostsRecentService.RecentPosts recentPosts) {
-        mRecentPostsView.getUIComponentDelegate().populateFromCache(recentPosts);
+        mRecentPostsView.getUiComponentDelegate().populateFromCache(recentPosts);
     }
 
     public void setRecentPostsEmptyFromCache() {
-        mRecentPostsView.getUIComponentDelegate().populateWithEmptyContentFromCache();
+        mRecentPostsView.getUiComponentDelegate().populateWithEmptyContentFromCache();
     }
 
     public void setRecentPostsEmptyFromServer() {
-        mRecentPostsView.getUIComponentDelegate().populateWithEmptyContentFromServer();
+        mRecentPostsView.getUiComponentDelegate().populateWithEmptyContentFromServer();
     }
 
     public void setRecentPostsError(String s) {
-        mRecentPostsView.getUIComponentDelegate().populateFromServerError();
+        mRecentPostsView.getUiComponentDelegate().populateFromServerError();
         Toast.makeText(getActivity(), s, Toast.LENGTH_LONG).show();
     }
 

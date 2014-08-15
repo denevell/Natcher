@@ -10,14 +10,14 @@ import android.widget.ListView;
 
 import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.app.component.Populatable;
-import com.newfivefour.natcher.app.component.UIComponent;
-import com.newfivefour.natcher.app.component.UIComponentDelegate;
+import com.newfivefour.natcher.app.component.UiComponent;
+import com.newfivefour.natcher.app.component.UiComponentDelegate;
 import com.newfivefour.natcher.app.component.UiComponentVanilla;
 import com.newfivefour.natcher.customviews.LoadingErrorEmptyWidget;
 import com.newfivefour.natcher.services.PostsRecentService;
 
 public class RecentPostsView extends FrameLayout implements
-        UIComponentDelegate<PostsRecentService.RecentPosts>,
+        UiComponentDelegate<PostsRecentService.RecentPosts>,
         Populatable<PostsRecentService.RecentPosts> {
 
     private final UiComponentVanilla<PostsRecentService.RecentPosts> mUIComponent;
@@ -43,7 +43,7 @@ public class RecentPostsView extends FrameLayout implements
     }
 
     @Override
-    public UIComponent<PostsRecentService.RecentPosts> getUIComponentDelegate() {
+    public UiComponent<PostsRecentService.RecentPosts> getUiComponentDelegate() {
         return mUIComponent;
     }
 
