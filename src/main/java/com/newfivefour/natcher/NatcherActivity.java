@@ -15,16 +15,12 @@ import com.newfivefour.natcher.screens.recentposts.NatcherFragment;
 public class NatcherActivity extends FragmentActivity implements SwipeInterface {
 
     private TextView mTextView;
-    private Fragment natcherFragment = new NatcherFragment();
-    private Fragment textFragment = new TextFragment();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.natcher_activity);
-
-        natcherFragment.setArguments(new Bundle());
 
         mTextView = (TextView) findViewById(R.id.textView);
         mTextView.setOnClickListener(new View.OnClickListener() {
@@ -45,24 +41,32 @@ public class NatcherActivity extends FragmentActivity implements SwipeInterface 
     }
 
     private void gotoOrangeFragment() {
+        Fragment textFragment = getFragmentManager().findFragmentByTag(TextFragment.class.getSimpleName());
+        if(textFragment==null) {
+            textFragment = new TextFragment();
+        }
         getFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(
                         R.animator.card_flip_right_in, R.animator.card_flip_right_out,
                         R.animator.card_flip_left_in, R.animator.card_flip_left_out)
                 .addToBackStack(TextFragment.class.getSimpleName())
-                .replace(R.id.container, textFragment)
+                .replace(R.id.container, textFragment, TextFragment.class.getSimpleName())
                 .commit();
     }
 
     private void gotoNatcherFragment() {
+        Fragment natcherFragment = getFragmentManager().findFragmentByTag(NatcherFragment.class.getSimpleName());
+        if(natcherFragment==null) {
+            natcherFragment = new NatcherFragment();
+        }
         getFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(
                         R.animator.card_flip_left_in, R.animator.card_flip_left_out,
                         R.animator.card_flip_right_in, R.animator.card_flip_right_out)
                 .addToBackStack(NatcherFragment.class.getSimpleName())
-                .replace(R.id.container, natcherFragment)
+                .replace(R.id.container, natcherFragment, NatcherFragment.class.getSimpleName())
                 .commit();
     }
 

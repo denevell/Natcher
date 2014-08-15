@@ -117,8 +117,6 @@ import android.view.ViewGroup;
  * Given we set a is empty callback
  * Then the widget that deals with errors and empty views is given that
  *
- * ### QUESTION: Are we leaking objects?
- *
  * ### QUESTION: Show fragment server error along with component server error?
  * ### ANSWER:   At the moment, the fragment doesn't know if the component will
  * ###           show an error on networking problem, so it does so anyway. The
