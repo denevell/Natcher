@@ -118,10 +118,30 @@ import android.view.ViewGroup;
  * Then the widget that deals with errors and empty views is given that
  *
  * ### QUESTION: Are we leaking objects?
+ *
  * ### QUESTION: Show fragment server error along with component server error?
- * ### QUESTION: Calling the populateStarting before first one can get to populated by server, server error, or is empty
- * ### QUESTION: What if we want to refresh to component when it already has data?
+ * ### ANSWER:   At the moment, the fragment doesn't know if the component will
+ * ###           show an error on networking problem, so it does so anyway. The
+ * ###           component won't  show one on cached content, but will on no content.
+ * ###           To be thought about.
+ *
+ * ### QUESTION: Calling the populateStarting before getting a response from the server?
+ * ### ANSWER:   To be thought about, the page wide boolean and shouldStartPagerLoaderAfterCache.
+ * ###           shouldStartPageL... may be problem if it's set to false, and then true by
+ * ###           a repeat call, but there'll only be once server response, since the networking
+ * ###           code doesn't do repeat requests if the first is already under way. Will see if we do pull to request,
+ * ###           meaning we may need to ensure populateStarting isn't called twice for the same request.
+ *
+ * ### QUESTION: What if we want to refresh the component when it already has data?
+ * ### ANSWER:   We need something like pull to refresh or swipe to refresh.
+ *
  * ### QUESTION: What about occasions when you don't want to get the data again on rotation etc, only when the user says?
+ * ### ANSWER:   In this case, we'll have the page-wide loading spinner keep displaying, since they only are removed
+ * ###           when the server returns a result, an error or empty content.
+ * ###           We could get around this, outside the component, by simply setting the overall page loader to false
+ * ###           after setting the cached content
+ * ###           If we were going to do it with the networking message bus service, then we'd need a way to say only give
+ * ###           me the cached content. We could alternatively use the response cache object directly.
  */
 public class UiComponentVanilla<T> implements UiComponent<T> {
     private static String TAG = UiComponentVanilla.class.getSimpleName();
@@ -169,28 +189,6 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
                 emptyLayout
                 );
         mPopulatable = populatable;
-    }
-
-    @Override
-    public void setEmptyConnector(EmptiableComponent connector) {
-        Log.d(TAG, "setEmptyConnector()");
-        if(mInComponentLoadingErrorWidget!=null) {
-            mInComponentLoadingErrorWidget.setEmptyConnector(connector);
-        }
-    }
-
-    @Override
-    public void setRefreshConnector(RefreshableComponent connector) {
-        Log.d(TAG, "setRefreshConnector()");
-        if(mInComponentLoadingErrorWidget!=null) {
-            mInComponentLoadingErrorWidget.setRefreshConnector(connector);
-        }
-    }
-
-    @Override
-    public void setPageWideLoadingConnector(LoadingComponent loadingComponent) {
-        Log.d(TAG, "setPageWideLoadingConnector()");
-        mPageWideLoader = loadingComponent;
     }
 
     @Override
@@ -263,6 +261,28 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setLoading(false);
         setServerError(false);
         setEmptyError(true);
+    }
+
+    @Override
+    public void setEmptyConnector(EmptiableComponent connector) {
+        Log.d(TAG, "setEmptyConnector()");
+        if(mInComponentLoadingErrorWidget!=null) {
+            mInComponentLoadingErrorWidget.setEmptyConnector(connector);
+        }
+    }
+
+    @Override
+    public void setRefreshConnector(RefreshableComponent connector) {
+        Log.d(TAG, "setRefreshConnector()");
+        if(mInComponentLoadingErrorWidget!=null) {
+            mInComponentLoadingErrorWidget.setRefreshConnector(connector);
+        }
+    }
+
+    @Override
+    public void setPageWideLoadingConnector(LoadingComponent loadingComponent) {
+        Log.d(TAG, "setPageWideLoadingConnector()");
+        mPageWideLoader = loadingComponent;
     }
 
     private void setLoading(boolean show) {
