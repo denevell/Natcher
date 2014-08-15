@@ -152,6 +152,10 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
      */
     private boolean mShouldStartPageLoaderAfterCachedResult = true;
 
+    /**
+     * @param populatable How we populate the view on server response, detect if it's empty and clear it if needs be
+     * @param parent The view the loading, error and empty layouts are going to attach to
+     */
     public UiComponentVanilla(
             Populatable<T> populatable,
             ViewGroup parent,
