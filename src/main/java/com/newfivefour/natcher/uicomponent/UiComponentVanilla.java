@@ -117,18 +117,40 @@ import android.view.ViewGroup;
  * Given we set a is empty callback
  * Then the widget that deals with errors and empty views is given that
  *
- * ### FIX: Keeping state on rotation
+ * ### QUESTION: Are we leaking objects?
  * ### QUESTION: Show fragment server error along with component server error?
  * ### QUESTION: Calling the populateStarting before first one can get to populated by server, server error, or is empty
  * ### QUESTION: What if we want to refresh to component when it already has data?
+ * ### QUESTION: What about occasions when you don't want to get the data again on rotation etc, only when the user says?
  */
 public class UiComponentVanilla<T> implements UiComponent<T> {
-    private final Populatable<T> mPopulatable;
+    private static String TAG = UiComponentVanilla.class.getSimpleName();
     private LoadingErrorEmptyWidget mInComponentLoadingErrorWidget;
     private LoadingComponent mPageWideLoader;
+
+    /**
+     * Used to communicate with whatever is using this as a delegate
+     */
+    private final Populatable<T> mPopulatable;
+
+    /**
+     * We don't need to store this to be given to this again on creation if we're giving this again on creation as default false,
+     * and later true when loading starts.
+     *
+     * And we will also get that again, since our requests will fire again, thereby calling start loading.
+     *
+     * This isn't a problem, per se, since our networking implementation won't be sending out the same requests again,
+     * just finishing existing ones.
+     */
     private boolean mPageWideLoadingStarted;
-    private boolean mHasDataFromService;
-    private static String TAG = UiComponentVanilla.class.getSimpleName();
+
+    /**
+     * We, as above, don't need to store this to be given to this again on creation.
+     *
+     * This is because the true state will be here by default, and you'll want that
+     * on a creation, since you'll be getting the data again.
+     */
+    private boolean mShouldStartPageLoaderAfterCachedResult = true;
 
     public UiComponentVanilla(
             Populatable<T> populatable,
@@ -170,7 +192,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateStarting() {
         Log.d(TAG, "populateStarting()");
-        mHasDataFromService = false;
+        mShouldStartPageLoaderAfterCachedResult = true;
         setEmptyError(false);
         setServerError(false);
         if(mPopulatable.hasEmptyContent()) {
@@ -187,7 +209,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setLoading(false);
         setServerError(false);
         setEmptyError(false);
-        if(!mHasDataFromService) {
+        if(mShouldStartPageLoaderAfterCachedResult) {
             Log.d(TAG, "populateFromCache(): setPageWideLoading");
             setPageWideLoading(true);
         }
@@ -196,7 +218,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateFromServer(T ob) {
         Log.d(TAG, "populateFromServer()");
-        mHasDataFromService = true;
+        mShouldStartPageLoaderAfterCachedResult = false;
         mPopulatable.populate(ob);
         setPageWideLoading(false);
         setLoading(false);
@@ -207,7 +229,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateFromServerError() {
         Log.d(TAG, "populateFromServerError()");
-        mHasDataFromService = true;
+        mShouldStartPageLoaderAfterCachedResult = false;
         if(mPopulatable.hasEmptyContent()) {
             Log.d(TAG, "populateFromServerError(): empty view content");
             setServerError(true);
