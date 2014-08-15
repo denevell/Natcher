@@ -1,5 +1,6 @@
 package com.newfivefour.natcher.app.component;
 
-public interface EmptyableComponent {
+public interface EmptiableComponent {
     void onIsEmpty();
 }
+

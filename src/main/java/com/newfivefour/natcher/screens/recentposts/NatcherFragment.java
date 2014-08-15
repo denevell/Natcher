@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.newfivefour.natcher.app.WindowLoadingSpinner;
-import com.newfivefour.natcher.app.component.EmptyableComponent;
+import com.newfivefour.natcher.app.component.EmptiableComponent;
 import com.newfivefour.natcher.app.component.LoadingComponent;
 import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.app.component.RefreshableComponent;
@@ -39,19 +39,19 @@ public class NatcherFragment extends android.app.Fragment
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.natcher_fragment, container, false);
         mRecentPostsView = (RecentPostsView) v.findViewById(R.id.natcher_listview);
-        mRecentPostsView.setRefreshConnector(new RefreshableComponent() {
+        mRecentPostsView.getUIComponentDelegate().setRefreshConnector(new RefreshableComponent() {
             @Override
             public void onRefreshContent() {
                 mPresenter.recentPostsFetch();
             }
         });
-        mRecentPostsView.setEmptyConnector(new EmptyableComponent() {
+        mRecentPostsView.getUIComponentDelegate().setEmptyConnector(new EmptiableComponent() {
             @Override
             public void onIsEmpty() {
                 Toast.makeText(getActivity(), "Yeah, it's empty.", Toast.LENGTH_LONG).show();
             }
         });
-        mRecentPostsView.setPageWideLoadingConnector(this);
+        mRecentPostsView.getUIComponentDelegate().setPageWideLoadingConnector(this);
         return v;
     }
 
@@ -68,27 +68,27 @@ public class NatcherFragment extends android.app.Fragment
     }
 
     public void setRecentPostsLoadingStart() {
-        mRecentPostsView.populateStarting();
+        mRecentPostsView.getUIComponentDelegate().populateStarting();
     }
 
     public void setRecentPosts(PostsRecentService.RecentPosts recentPosts) {
-        mRecentPostsView.populateFromServer(recentPosts);
+        mRecentPostsView.getUIComponentDelegate().populateFromServer(recentPosts);
     }
 
     public void setRecentPostsFromCache(PostsRecentService.RecentPosts recentPosts) {
-        mRecentPostsView.populateFromCache(recentPosts);
+        mRecentPostsView.getUIComponentDelegate().populateFromCache(recentPosts);
     }
 
     public void setRecentPostsEmptyFromCache() {
-        mRecentPostsView.populateWithEmptyContentFromCache();
+        mRecentPostsView.getUIComponentDelegate().populateWithEmptyContentFromCache();
     }
 
     public void setRecentPostsEmptyFromServer() {
-        mRecentPostsView.populateWithEmptyContentFromServer();
+        mRecentPostsView.getUIComponentDelegate().populateWithEmptyContentFromServer();
     }
 
     public void setRecentPostsError(String s) {
-        mRecentPostsView.populateFromServerError();
+        mRecentPostsView.getUIComponentDelegate().populateFromServerError();
         Toast.makeText(getActivity(), s, Toast.LENGTH_LONG).show();
     }
 

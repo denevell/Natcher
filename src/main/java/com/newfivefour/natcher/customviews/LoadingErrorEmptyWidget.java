@@ -6,14 +6,14 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.newfivefour.natcher.app.component.EmptyableComponent;
-import com.newfivefour.natcher.app.component.EmptyableContentConnector;
+import com.newfivefour.natcher.app.component.EmptiableComponent;
+import com.newfivefour.natcher.app.component.EmptiableContentConnector;
 import com.newfivefour.natcher.app.component.RefreshableComponent;
 import com.newfivefour.natcher.app.component.RefreshableContentConnector;
 
 public class LoadingErrorEmptyWidget implements
         RefreshableContentConnector,
-        EmptyableContentConnector {
+        EmptiableContentConnector {
     private final View mError;
     private final View mEmpty;
     private View mLoading;
@@ -84,10 +84,10 @@ public class LoadingErrorEmptyWidget implements
     }
 
     @Override
-    public void setEmptyConnector(EmptyableComponent connector) {
+    public void setEmptyConnector(EmptiableComponent connector) {
         if(connector==null) return;
-        if(mEmpty !=null && mEmpty instanceof EmptyableContentConnector) {
-            ((EmptyableContentConnector)mEmpty).setEmptyConnector(connector);
+        if(mEmpty !=null && mEmpty instanceof EmptiableContentConnector) {
+            ((EmptiableContentConnector)mEmpty).setEmptyConnector(connector);
         }
     }
 }

@@ -7,14 +7,14 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.newfivefour.natcher.R;
-import com.newfivefour.natcher.app.component.EmptyableContentConnector;
-import com.newfivefour.natcher.app.component.EmptyableComponent;
+import com.newfivefour.natcher.app.component.EmptiableComponent;
+import com.newfivefour.natcher.app.component.EmptiableContentConnector;
 import com.newfivefour.natcher.app.component.RefreshableComponent;
 import com.newfivefour.natcher.app.component.RefreshableContentConnector;
 
 public class EmptyViewGeneric extends FrameLayout implements
         RefreshableContentConnector,
-        EmptyableContentConnector {
+        EmptiableContentConnector {
 
     private final View mRefreshButton;
     private final View mTextView;
@@ -43,7 +43,7 @@ public class EmptyViewGeneric extends FrameLayout implements
     }
 
     @Override
-    public void setEmptyConnector(final EmptyableComponent connector) {
+    public void setEmptyConnector(final EmptiableComponent connector) {
         if(mTextView!=null) {
             mTextView.setOnClickListener(new OnClickListener() {
                 @Override
