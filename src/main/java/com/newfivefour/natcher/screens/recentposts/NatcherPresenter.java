@@ -16,12 +16,17 @@ public class NatcherPresenter implements Presenter {
     @Override
     public void onResume() {
         Application.getEventBus().register(this);
-        new PostsRecentService().fetch(mView.getArguments());
+        recentPostsFetch();
     }
 
     @Override
     public void onPause() {
         Application.getEventBus().unregister(this);
+    }
+
+    public void recentPostsFetch() {
+        new PostsRecentService().fetch(mView.getArguments());
+        mView.setRecentPostsLoadingStart();
     }
 
     @Subscribe
@@ -37,5 +42,14 @@ public class NatcherPresenter implements Presenter {
     @Subscribe
     public void recentPostsError(PostsRecentService.RecentPostsError error) {
         mView.setRecentPostsError("Network error");
+    }
+
+    @Subscribe
+    public void recentPostsEmpty (PostsRecentService.RecentPostsEmpty empty) {
+        if(empty.isFromCached()) {
+            mView.setRecentPostsEmptyFromCache();
+        } else {
+            mView.setRecentPostsEmptyFromServer();
+        }
     }
 }

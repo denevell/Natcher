@@ -2,8 +2,9 @@ package com.newfivefour.natcher.services;
 
 import android.os.Bundle;
 
-import com.newfivefour.natcher.networking.ErrorResponse;
 import com.newfivefour.natcher.networking.NetworkingMessageBusService;
+import com.newfivefour.natcher.networking.ResponseEmpty;
+import com.newfivefour.natcher.networking.ResponseError;
 
 import java.util.List;
 
@@ -22,10 +23,17 @@ public class PostsRecentService {
         new NetworkingMessageBusService.Builder<RecentPosts, RecentPostsServiceInterface>()
                 .dontRerequestExistingRequest(f)
                 .cacheRequest("/post/0/10", new RecentPostsCached())
+                .detectEmptyResponse(new NetworkingMessageBusService.IsEmpty<RecentPosts>() {
+                                         @Override public boolean isEmpty(RecentPosts res) {
+                                             return res.getPosts()==null || res.getPosts().size()==0;
+                                         }
+                                     },
+                        new RecentPostsEmpty())
                 .fetch(baseUrl,
                         RecentPostsServiceInterface.class,
                         new NetworkingMessageBusService.GetResult<RecentPosts, RecentPostsServiceInterface>() {
-                            @Override public RecentPosts getResult(RecentPostsServiceInterface service) throws Exception {
+                            @Override
+                            public RecentPosts getResult(RecentPostsServiceInterface service) throws Exception {
                                 return service.go(0, 10);
                             }
                         },
@@ -43,7 +51,8 @@ public class PostsRecentService {
         RecentPosts go(@Path("start") int start, @Path("num") int num);
     }
 
-    public static class RecentPostsError extends ErrorResponse {}
+    public static class RecentPostsError extends ResponseError {}
+    public static class RecentPostsEmpty extends ResponseEmpty {}
     public static class RecentPostsCached extends NetworkingMessageBusService.CachedResponse<RecentPosts> {};
     public static class RecentPosts {
 

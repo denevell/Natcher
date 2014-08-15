@@ -8,7 +8,11 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
-import com.newfivefour.natcher.LoadingWidget;
+import com.newfivefour.natcher.app.component.EmptyableContentConnector;
+import com.newfivefour.natcher.app.component.EmptyableComponent;
+import com.newfivefour.natcher.app.component.RefreshableComponent;
+import com.newfivefour.natcher.app.component.RefreshableContentConnector;
+import com.newfivefour.natcher.customviews.LoadingErrorEmptyWidget;
 import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.app.component.LoadingComponent;
 import com.newfivefour.natcher.app.component.ParentLoadingConnector;
@@ -17,17 +21,24 @@ import com.newfivefour.natcher.services.PostsRecentService;
 
 public class RecentPostsView extends FrameLayout implements
         PopulatableComponent<PostsRecentService.RecentPosts>,
-        ParentLoadingConnector {
+        ParentLoadingConnector,
+        RefreshableContentConnector,
+        EmptyableContentConnector {
 
-    private final LoadingWidget mInComponentLoadingWidget;
+    private LoadingErrorEmptyWidget mInComponentLoadingErrorWidget;
     private ListView mListView;
     private LoadingComponent mPageWideLoadingConnector;
-    private boolean mHasSetFromServer;
+    private boolean mHasDataFromService;
+    private boolean mPageWideLoadingStarted;
 
     public RecentPostsView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         LayoutInflater.from(context).inflate(R.layout.natcher_listview, this, true);
-        mInComponentLoadingWidget = new LoadingWidget(this);
+        mInComponentLoadingErrorWidget = new LoadingErrorEmptyWidget(
+                this,
+                R.layout.loading_layout,
+                R.layout.error_container,
+                R.layout.empty_container);
         mListView = (ListView) findViewById(R.id.listView);
     }
 
@@ -36,32 +47,83 @@ public class RecentPostsView extends FrameLayout implements
     }
 
     @Override
+    public void populateStarting() {
+        mHasDataFromService = false;
+        setEmptyError(false);
+        setServerError(false);
+        if(isEmptyContent()) {
+            setLoading(true);
+        } else {
+            setPageWideLoading(true);
+        }
+    }
+
+    @Override
     public void populateFromCache(PostsRecentService.RecentPosts ob) {
         populateListView(ob);
-        setDisabledInComponentLoading();
-        if(!mHasSetFromServer && mPageWideLoadingConnector !=null) {
-            mPageWideLoadingConnector.loadingStart();
+        setLoading(false);
+        setServerError(false);
+        setEmptyError(false);
+        if(!mHasDataFromService) {
+            setPageWideLoading(true);
         }
     }
 
     @Override
     public void populateFromServer(PostsRecentService.RecentPosts ob) {
         populateListView(ob);
-        setDisabledPageWideLoading();
-        setDisabledInComponentLoading();
-        mHasSetFromServer = true;
+        setPageWideLoading(false);
+        setLoading(false);
+        setServerError(false);
+        setEmptyError(false);
     }
 
     @Override
     public void populateFromServerError() {
-        setDisabledPageWideLoading();
-        setDisabledInComponentLoading();
+        if(isEmptyContent()) {
+            setServerError(true);
+        } else {
+            setServerError(false);
+        }
+        setPageWideLoading(false);
+        setLoading(false);
+        setEmptyError(false);
     }
 
     @Override
-    public void isEmpty() {
-        setDisabledPageWideLoading();
-        setDisabledInComponentLoading();
+    public void populateWithEmptyContentFromServer() {
+        clearListView();
+        setPageWideLoading(false);
+        setLoading(false);
+        setServerError(false);
+        setEmptyError(true);
+    }
+
+    @Override
+    public void populateWithEmptyContentFromCache() {
+        clearListView();
+        setLoading(false);
+        setServerError(false);
+        setEmptyError(true);
+    }
+
+    @Override
+    public void setPageWideLoadingConnector(LoadingComponent loadingComponent) {
+        mPageWideLoadingConnector = loadingComponent;
+    }
+
+    @Override
+    public void setRefreshConnector(RefreshableComponent connector) {
+        if(mInComponentLoadingErrorWidget!=null) {
+            mInComponentLoadingErrorWidget.setRefreshConnector(connector);
+        }
+    }
+
+    @Override
+    public void setEmptyConnector(EmptyableComponent connector) {
+        if(mInComponentLoadingErrorWidget!=null) {
+            mInComponentLoadingErrorWidget.setEmptyConnector(connector);
+        }
     }
 
     private void populateListView(PostsRecentService.RecentPosts ob) {
@@ -77,20 +139,42 @@ public class RecentPostsView extends FrameLayout implements
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void setPageWideLoadingConnector(LoadingComponent loadingComponent) {
-        mPageWideLoadingConnector = loadingComponent;
+    public boolean isEmptyContent() {
+        return mListView.getAdapter() == null || mListView.getAdapter().getCount() == 0;
     }
 
-    private void setDisabledPageWideLoading() {
+    private void clearListView() {
+        mListView.setAdapter(null);
+    }
+
+    private void setPageWideLoading(boolean show) {
         if(mPageWideLoadingConnector !=null) {
-            mPageWideLoadingConnector.loadingStop();
+            if(show && mPageWideLoadingStarted) {
+                return;
+            }
+            if(!show && !mPageWideLoadingStarted) {
+                return;
+            }
+            mPageWideLoadingStarted = show;
+            mPageWideLoadingConnector.loadingStart(show);
         }
     }
 
-    private void setDisabledInComponentLoading() {
-        if(mInComponentLoadingWidget!=null) {
-            mInComponentLoadingWidget.hide();
+    private void setLoading(boolean show) {
+        if(mInComponentLoadingErrorWidget !=null) {
+            mInComponentLoadingErrorWidget.showLoading(show);
+        }
+    }
+
+    private void setServerError(boolean show) {
+        if(mInComponentLoadingErrorWidget!=null) {
+            mInComponentLoadingErrorWidget.showError(show);
+        }
+    }
+
+    private void setEmptyError(boolean show) {
+        if(mInComponentLoadingErrorWidget!=null) {
+            mInComponentLoadingErrorWidget.showEmpty(show);
         }
     }
 }

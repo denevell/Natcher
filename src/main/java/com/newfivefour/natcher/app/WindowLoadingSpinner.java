@@ -13,18 +13,13 @@ public class WindowLoadingSpinner implements LoadingComponent {
     }
 
     @Override
-    public void loadingStop() {
-        if(mActivity!=null) {
-            mActivity.setProgressBarIndeterminateVisibility(false);
-            mActivity.setProgressBarVisibility(false);
-        }
-    }
-
-    @Override
-    public void loadingStart() {
-        if(mActivity!=null) {
+    public void loadingStart(boolean start) {
+        if(mActivity!=null && start) {
             mActivity.setProgressBarIndeterminateVisibility(true);
             mActivity.setProgressBarVisibility(true);
+        } else {
+            mActivity.setProgressBarIndeterminateVisibility(false);
+            mActivity.setProgressBarVisibility(false);
         }
     }
 }

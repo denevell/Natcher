@@ -34,6 +34,10 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
         public ReturnResult getResult(ServiceClass mService) throws Exception;
     }
 
+    public static interface IsEmpty<ReturnResult> {
+        public boolean isEmpty(ReturnResult result);
+    }
+
     public static class CachedResponse<ReturnResult> {
         private ReturnResult mRes;
 
@@ -51,6 +55,8 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
         private CachedResponse<ReturnResult> cacheResponse;
         private String cachedResponseUri;
         private Bundle requestUuidBundle;
+        private ResponseEmpty isEmptyObject;
+        private IsEmpty isEmptyCallback;
 
         /**
         * @param converter The Retrofit converter, GsonConverter normally and by default
@@ -90,6 +96,16 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
         }
 
         /**
+         * Set this if you want to return a specific object if the server's response is empty
+         * @return
+         */
+        public Builder detectEmptyResponse(IsEmpty<ReturnResult> isEmptyCallback, ResponseEmpty isEmptyObject) {
+            this.isEmptyCallback = isEmptyCallback;
+            this.isEmptyObject = isEmptyObject;
+            return this;
+        }
+
+        /**
          * Fetches an object from an end point
          *
          * @param baseUrl      url
@@ -100,7 +116,7 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
         public void fetch(String baseUrl,
                      Class<ServiceClass> serviceClass,
                      GetResult<ReturnResult, ServiceClass> getResult,
-                     ErrorResponse errorResponse,
+                     ResponseError errorResponse,
                      Class<? extends ReturnResult> returnType) {
             NetworkingMessageBusService<ReturnResult, ServiceClass> service = new NetworkingMessageBusService<ReturnResult, ServiceClass>();
             service.fetch(baseUrl,
@@ -111,6 +127,8 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                     cacheResponse,
                     cachedResponseUri,
                     requestUuidBundle,
+                    isEmptyCallback,
+                    isEmptyObject,
                     returnType);
         }
     }
@@ -119,21 +137,40 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                       Class<ServiceClass> serviceClass,
                       Converter converter,
                       GetResult<ReturnResult, ServiceClass> getResult,
-                      ErrorResponse errorResponse,
+                      ResponseError errorResponse,
                       CachedResponse<ReturnResult> cacheResponse,
                       String cachedResponseUri,
                       Bundle requestUuidBundle,
+                      IsEmpty<ReturnResult> isEmptyCallback,
+                      ResponseEmpty isEmptyObject,
                       Class<? extends ReturnResult> returnType) {
 
         OkClient ok = createHttpClient();
         ServiceClass service = createServiceClass(baseUrl, serviceClass, converter, ok);
-        returnCacheIfAvailable(baseUrl+cachedResponseUri, cacheResponse, returnType);
 
+        // Cached response
+        returnCacheIfAvailable(
+                    baseUrl+cachedResponseUri,
+                    cacheResponse,
+                    isEmptyCallback,
+                    isEmptyObject,
+                    returnType);
+
+        // Server response
         String requestUuid = RequestQueue.getUuidFromBundle(requestUuidBundle);
         if(RequestQueue.isRequestUnderway(requestUuid)) {
             Log.d(TAG, "We're already fetching it apparently.");
         } else {
-            returnNetworkResponse(baseUrl, cachedResponseUri, requestUuid, getResult, errorResponse, service, returnType);
+            returnNetworkResponse(
+                    baseUrl,
+                    cachedResponseUri,
+                    requestUuid,
+                    getResult,
+                    errorResponse,
+                    isEmptyCallback,
+                    isEmptyObject,
+                    service,
+                    returnType);
         }
     }
 
@@ -141,7 +178,9 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                                        final String cachedResponseUri,
                                        final String requestUuid,
                                        final GetResult<ReturnResult, ServiceClass> getResult,
-                                       final ErrorResponse errorResponse,
+                                       final ResponseError errorResponse,
+                                       final IsEmpty<ReturnResult> isEmptyCallback,
+                                       final ResponseEmpty isEmptyResponse,
                                        final ServiceClass service,
                                        final Class<? extends ReturnResult> returnType) {
         new AsyncTask<Void, Void, ReturnResult>() {
@@ -182,7 +221,11 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
             protected void onPostExecute(ReturnResult res) {
                 Log.d(TAG, "onPostExecute()");
                 RequestQueue.removeUuid(requestUuid);
-                if (res != null) {
+                if(res != null && isEmptyCallback!=null && isEmptyResponse!=null && isEmptyCallback.isEmpty(res)) {
+                    Log.d(TAG, "onPostExecute() detected empty response.");
+                    isEmptyResponse.setIsFromCache(false);
+                    Application.getEventBus().post(isEmptyResponse);
+                } else if (res != null) {
                     Log.d(TAG, "onPostExecute(): Sending good result back");
                     super.onPostExecute(res);
                     Application.getEventBus().post(res);
@@ -194,7 +237,12 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    private void returnCacheIfAvailable(final String fullCachedUrl, final CachedResponse<ReturnResult> cacheResponse, final Class<? extends ReturnResult> returnType) {
+    private void returnCacheIfAvailable(
+            final String fullCachedUrl,
+            final CachedResponse<ReturnResult> cacheResponse,
+            final IsEmpty<ReturnResult> isEmptyCallback,
+            final ResponseEmpty isEmptyResponse,
+            final Class<? extends ReturnResult> returnType) {
         if(cacheResponse!=null) {
             new AsyncTask<Void, Void, ReturnResult>() {
                 @Override
@@ -212,7 +260,11 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                 @Override
                 protected void onPostExecute(ReturnResult res) {
                     Log.d(TAG, "onPostExecute() (cached)");
-                    if(res!=null) {
+                    if(res!=null && isEmptyCallback!=null && isEmptyResponse!=null && isEmptyCallback.isEmpty(res)) {
+                        Log.d(TAG, "onPostExecute() detected cached empty response.");
+                        isEmptyResponse.setIsFromCache(true);
+                        Application.getEventBus().post(isEmptyResponse);
+                    } else if(res!=null) {
                         Log.d(TAG, "onPostExecute() Sending back cached response initially.");
                         Application.getEventBus().post(cacheResponse.setCache(res));
                     } else {
