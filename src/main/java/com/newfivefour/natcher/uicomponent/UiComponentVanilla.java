@@ -117,6 +117,9 @@ import android.view.ViewGroup;
  * Given we set a is empty callback
  * Then the widget that deals with errors and empty views is given that
  *
+ * ### QUESTION: What if we want to refresh the component when it already has data?
+ * ### ANSWER:   We need something like pull to refresh or swipe to refresh.
+ *
  * ### QUESTION: Show fragment server error along with component server error?
  * ### ANSWER:   At the moment, the fragment doesn't know if the component will
  * ###           show an error on networking problem, so it does so anyway. The
@@ -129,9 +132,6 @@ import android.view.ViewGroup;
  * ###           a repeat call, but there'll only be once server response, since the networking
  * ###           code doesn't do repeat requests if the first is already under way. Will see if we do pull to request,
  * ###           meaning we may need to ensure populateStarting isn't called twice for the same request.
- *
- * ### QUESTION: What if we want to refresh the component when it already has data?
- * ### ANSWER:   We need something like pull to refresh or swipe to refresh.
  *
  * ### QUESTION: What about occasions when you don't want to get the data again on rotation etc, only when the user says?
  * ### ANSWER:   In this case, we'll have the page-wide loading spinner keep displaying, since they only are removed
@@ -227,7 +227,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     }
 
     @Override
-    public void populateFromServerError() {
+    public void populateFromServerError(int responseCode) {
         Log.d(TAG, "populateFromServerError()");
         mShouldStartPageLoaderAfterCachedResult = false;
         if(mPopulatable.hasEmptyContent()) {

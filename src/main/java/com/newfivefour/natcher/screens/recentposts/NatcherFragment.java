@@ -87,8 +87,8 @@ public class NatcherFragment extends android.app.Fragment
         mRecentPostsView.getUiComponentDelegate().populateWithEmptyContentFromServer();
     }
 
-    public void setRecentPostsError(String s) {
-        mRecentPostsView.getUiComponentDelegate().populateFromServerError();
+    public void setRecentPostsError(String s, int responseCode) {
+        mRecentPostsView.getUiComponentDelegate().populateFromServerError(responseCode);
         Toast.makeText(getActivity(), s, Toast.LENGTH_LONG).show();
     }
 

@@ -41,7 +41,7 @@ public class NatcherPresenter implements Presenter {
 
     @Subscribe
     public void recentPostsError(PostsRecentService.RecentPostsError error) {
-        mView.setRecentPostsError("Network error");
+        mView.setRecentPostsError("Network error", error.getResponseCode());
     }
 
     @Subscribe

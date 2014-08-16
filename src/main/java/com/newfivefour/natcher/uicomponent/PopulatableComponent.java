@@ -12,7 +12,7 @@ public interface PopulatableComponent<T> {
     void populateStarting();
     void populateFromCache(T ob);
     void populateFromServer(T ob);
-    void populateFromServerError();
+    void populateFromServerError(int responseCode);
     void populateWithEmptyContentFromServer();
     void populateWithEmptyContentFromCache();
 }
