@@ -11,9 +11,9 @@ import android.widget.ListView;
 
 import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.services.PostsRecentService;
-import com.newfivefour.natcher.uicomponent.LoadingErrorEmptyWidget;
+import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
 import com.newfivefour.natcher.uicomponent.Populatable;
-import com.newfivefour.natcher.uicomponent.SwipeToRefreshWidget;
+import com.newfivefour.natcher.uicomponent.widgets.SwipeToRefreshWidget;
 import com.newfivefour.natcher.uicomponent.UiComponent;
 import com.newfivefour.natcher.uicomponent.UiComponentDelegate;
 import com.newfivefour.natcher.uicomponent.UiComponentVanilla;
@@ -29,14 +29,15 @@ public class RecentPostsView extends FrameLayout implements
     public RecentPostsView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-        View rootView = LayoutInflater.from(context).inflate(R.layout.natcher_listview, this, false);
-        mListView = (ListView) rootView.findViewById(R.id.listView);
-
         SwipeToRefreshWidget swipe = new SwipeToRefreshWidget(context, attrs);
-        swipe.fixListView(mListView);
-
         addView(swipe);
+
+        View rootView = LayoutInflater.from(context).inflate(R.layout.natcher_listview, this, false);
         swipe.addView(rootView);
+
+        // Get the ListView
+        mListView = (ListView) rootView.findViewById(R.id.listView);
+        swipe.fixListView(mListView);
 
         // Setup ui component
         mUIComponent = new UiComponentVanilla<PostsRecentService.RecentPosts>()

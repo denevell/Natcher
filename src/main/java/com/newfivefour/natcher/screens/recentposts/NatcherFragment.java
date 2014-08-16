@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.newfivefour.natcher.R;
-import com.newfivefour.natcher.uicomponent.WindowLoadingSpinner;
+import com.newfivefour.natcher.uicomponent.widgets.WindowLoadingSpinnerWidget;
 import com.newfivefour.natcher.services.PostsRecentService;
 import com.newfivefour.natcher.uicomponent.EmptiableComponent;
 import com.newfivefour.natcher.uicomponent.Refreshable;
@@ -16,7 +16,7 @@ public class NatcherFragment extends android.app.Fragment {
 
     private NatcherPresenter mPresenter;
     private RecentPostsView mRecentPostsView;
-    private WindowLoadingSpinner mWindowLoadingSpinnerDelegate;
+    private WindowLoadingSpinnerWidget mWindowLoadingSpinnerDelegate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

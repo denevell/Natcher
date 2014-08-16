@@ -1,10 +1,15 @@
-package com.newfivefour.natcher.uicomponent;
+package com.newfivefour.natcher.uicomponent.widgets;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import com.newfivefour.natcher.uicomponent.EmptiableComponent;
+import com.newfivefour.natcher.uicomponent.EmptiableContentConnector;
+import com.newfivefour.natcher.uicomponent.Refreshable;
+import com.newfivefour.natcher.uicomponent.RefreshableConnector;
 
 public class LoadingErrorEmptyWidget implements
         RefreshableConnector,

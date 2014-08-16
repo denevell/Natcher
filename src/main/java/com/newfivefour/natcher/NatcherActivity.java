@@ -59,6 +59,7 @@ public class NatcherActivity extends FragmentActivity implements SwipeInterface 
         Fragment natcherFragment = getFragmentManager().findFragmentByTag(NatcherFragment.class.getSimpleName());
         if(natcherFragment==null) {
             natcherFragment = new NatcherFragment();
+            natcherFragment.setArguments(new Bundle());
         }
         getFragmentManager()
                 .beginTransaction()

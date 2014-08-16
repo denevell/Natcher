@@ -1,6 +1,7 @@
 package com.newfivefour.natcher.networking;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -15,19 +16,21 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class RequestQueue {
 
     private static CopyOnWriteArraySet<String> sCurrentFetches = new CopyOnWriteArraySet<String>();
+    private static String TAG = RequestQueue.class.getSimpleName();
 
     public static String getUuidFromBundle(Bundle requestUuidBundle) {
-        String existingRequestUuid = null;
-        if (requestUuidBundle!=null) {
-            existingRequestUuid = requestUuidBundle.getString("REQUEST_UUID");
+        if(requestUuidBundle==null) {
+            Log.d(TAG, "Request uuid bundle is null");
+            return null;
         }
+        String existingRequestUuid = null;
+        existingRequestUuid = requestUuidBundle.getString("REQUEST_UUID");
         if (existingRequestUuid==null) {
+            Log.d(TAG, "Generating a new request uuid");
             String uuid = UUID.randomUUID().toString();
             existingRequestUuid = uuid;
         }
-        if (requestUuidBundle!=null) {
-            requestUuidBundle.putString("REQUEST_UUID", existingRequestUuid);
-        }
+        requestUuidBundle.putString("REQUEST_UUID", existingRequestUuid);
         return existingRequestUuid;
     }
 

@@ -3,6 +3,8 @@ package com.newfivefour.natcher.uicomponent;
 import android.util.Log;
 import android.view.ViewGroup;
 
+import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
+
 /**
  * Allows your component to enjoy all the goodness of a UiComponent
  * i.e. dealing with loading views, error views, empty views, cached content,
@@ -117,19 +119,6 @@ import android.view.ViewGroup;
  * Given we set a is empty callback
  * Then the widget that deals with errors and empty views is given that
  *
- * What about the refresh ui listener. It would be nice for the ui component to deal with that,
- * since the refreshing action also deals with the loading views.
- *
- * Seems like we'd need the swipetorefresh or whatever to implement some kind of interface,
- * SetRefreshConnector seems to be the one. That would then tell the ui component it need to
- * start the component loading? No, since swipe to refresh will already be doing that. Hmm.
- *
- * Swipe to refresh, or view containing that, needs to be given the callback for refreshing content,
- * at least.
- *
- * ### QUESTION: What if we want to refresh the component when it already has data?
- * ### ANSWER:   We need something like pull to refresh or swipe to refresh.
- *
  * ### QUESTION: Show fragment server error along with component server error?
  * ### ANSWER:   At the moment, the fragment doesn't know if the component will
  * ###           show an error on networking problem, so it does so anyway. The
@@ -142,6 +131,11 @@ import android.view.ViewGroup;
  * ###           a repeat call, but there'll only be once server response, since the networking
  * ###           code doesn't do repeat requests if the first is already under way. Will see if we do pull to request,
  * ###           meaning we may need to ensure populateStarting isn't called twice for the same request.
+ *
+ * ### QUESTION: What if we want to refresh the component when it already has data?
+ * ### ANSWER:   We need something like pull to refresh or swipe to refresh, by sending it a
+ * ###           refreshable connector when the setRefreshableConnector is called on the UiComponent.
+ * ###           This, therefore, will be able to run the refresh method at its leisure.
  *
  * ### QUESTION: What about occasions when you don't want to get the data again on rotation etc, only when the user says?
  * ### ANSWER:   In this case, we'll have the page-wide loading spinner keep displaying, since they only are removed

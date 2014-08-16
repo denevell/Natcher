@@ -1,9 +1,13 @@
-package com.newfivefour.natcher.uicomponent;
+package com.newfivefour.natcher.uicomponent.widgets;
 
 import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.widget.AbsListView;
+
+import com.newfivefour.natcher.uicomponent.LoadingComponent;
+import com.newfivefour.natcher.uicomponent.Refreshable;
+import com.newfivefour.natcher.uicomponent.RefreshableConnector;
 
 public class SwipeToRefreshWidget extends SwipeRefreshLayout
         implements RefreshableConnector, LoadingComponent {
