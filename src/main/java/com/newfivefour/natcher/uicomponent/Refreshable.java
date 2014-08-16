@@ -1,5 +1,5 @@
 package com.newfivefour.natcher.uicomponent;
 
-public interface RefreshableComponent {
+public interface Refreshable {
     void onRefreshContent();
 }

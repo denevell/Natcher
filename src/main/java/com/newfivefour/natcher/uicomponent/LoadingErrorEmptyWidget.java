@@ -7,7 +7,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 public class LoadingErrorEmptyWidget implements
-        RefreshableContentConnector,
+        RefreshableConnector,
         EmptiableContentConnector {
     private final View mError;
     private final View mEmpty;
@@ -72,13 +72,13 @@ public class LoadingErrorEmptyWidget implements
     }
 
     @Override
-    public void setRefreshConnector(final RefreshableComponent connector) {
+    public void setRefreshableConnector(final Refreshable connector) {
         if(connector==null) return;
-        if(mError instanceof RefreshableContentConnector) {
-            ((RefreshableContentConnector)mError).setRefreshConnector(connector);
+        if(mError instanceof RefreshableConnector) {
+            ((RefreshableConnector)mError).setRefreshableConnector(connector);
         }
-        if(mEmpty instanceof RefreshableContentConnector) {
-            ((RefreshableContentConnector)mEmpty).setRefreshConnector(connector);
+        if(mEmpty instanceof RefreshableConnector) {
+            ((RefreshableConnector)mEmpty).setRefreshableConnector(connector);
         }
     }
 

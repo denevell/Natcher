@@ -1,4 +1,4 @@
-package com.newfivefour.natcher.app;
+package com.newfivefour.natcher.uicomponent;
 
 import android.app.Activity;
 import android.util.Log;

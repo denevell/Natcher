@@ -117,6 +117,16 @@ import android.view.ViewGroup;
  * Given we set a is empty callback
  * Then the widget that deals with errors and empty views is given that
  *
+ * What about the refresh ui listener. It would be nice for the ui component to deal with that,
+ * since the refreshing action also deals with the loading views.
+ *
+ * Seems like we'd need the swipetorefresh or whatever to implement some kind of interface,
+ * SetRefreshConnector seems to be the one. That would then tell the ui component it need to
+ * start the component loading? No, since swipe to refresh will already be doing that. Hmm.
+ *
+ * Swipe to refresh, or view containing that, needs to be given the callback for refreshing content,
+ * at least.
+ *
  * ### QUESTION: What if we want to refresh the component when it already has data?
  * ### ANSWER:   We need something like pull to refresh or swipe to refresh.
  *
@@ -145,11 +155,12 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     private static String TAG = UiComponentVanilla.class.getSimpleName();
     private LoadingErrorEmptyWidget mInComponentLoadingErrorWidget;
     private LoadingComponent mPageWideLoader;
+    private RefreshableConnector mRefreshWidget;
 
     /**
      * Used to communicate with whatever is using this as a delegate
      */
-    private final Populatable<T> mPopulatable;
+    private Populatable<T> mPopulatable = null;
 
     /**
      * We don't need to store this to be given to this again on creation if we're giving this again on creation as default false,
@@ -170,23 +181,33 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
      */
     private boolean mShouldStartPageLoaderAfterCachedResult = true;
 
-    /**
-     * @param populatable How we populate the view on server response, detect if it's empty and clear it if needs be
-     * @param parent The view the loading, error and empty layouts are going to attach to
-     */
-    public UiComponentVanilla(
-            Populatable<T> populatable,
-            ViewGroup parent,
-            int loadingLayout,
-            int errorLayout,
-            int emptyLayout) {
+    public UiComponentVanilla() {}
+
+    public UiComponentVanilla<T> setErrorEmptyLoading(
+        ViewGroup parent,
+        int loadingLayout,
+        int errorLayout,
+        int emptyLayout) {
         mInComponentLoadingErrorWidget = new LoadingErrorEmptyWidget(
                 parent,
                 loadingLayout,
                 errorLayout,
                 emptyLayout
-                );
+        );
+        return this;
+    }
+
+    /**
+     * @param populatable How we populate the view on server response, detect if it's empty and clear it if needs be
+     */
+    public UiComponentVanilla<T> setConnector(Populatable<T> populatable) {
         mPopulatable = populatable;
+        return this;
+    }
+
+    public UiComponentVanilla<T> setRefreshWidget(RefreshableConnector refreshWidget) {
+        mRefreshWidget = refreshWidget;
+        return this;
     }
 
     @Override
@@ -270,10 +291,13 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     }
 
     @Override
-    public void setRefreshConnector(RefreshableComponent connector) {
-        Log.d(TAG, "setRefreshConnector()");
+    public void setRefreshableConnector(Refreshable connector) {
+        Log.d(TAG, "setRefreshableConnector()");
         if(mInComponentLoadingErrorWidget!=null) {
-            mInComponentLoadingErrorWidget.setRefreshConnector(connector);
+            mInComponentLoadingErrorWidget.setRefreshableConnector(connector);
+        }
+        if(mRefreshWidget!=null) {
+            mRefreshWidget.setRefreshableConnector(connector);
         }
     }
 
@@ -313,4 +337,5 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
             mPageWideLoader.loadingStart(show);
         }
     }
+
 }

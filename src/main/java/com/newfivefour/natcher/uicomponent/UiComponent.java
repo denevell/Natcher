@@ -10,6 +10,6 @@ package com.newfivefour.natcher.uicomponent;
 public interface UiComponent<T> extends
         PopulatableComponent<T>,
         ParentLoadingConnector,
-        RefreshableContentConnector,
+        RefreshableConnector,
         EmptiableContentConnector {
 }

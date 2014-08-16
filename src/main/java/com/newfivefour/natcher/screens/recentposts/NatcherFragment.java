@@ -6,15 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.newfivefour.natcher.app.WindowLoadingSpinner;
-import com.newfivefour.natcher.uicomponent.EmptiableComponent;
-import com.newfivefour.natcher.uicomponent.LoadingComponent;
 import com.newfivefour.natcher.R;
-import com.newfivefour.natcher.uicomponent.RefreshableComponent;
+import com.newfivefour.natcher.uicomponent.WindowLoadingSpinner;
 import com.newfivefour.natcher.services.PostsRecentService;
+import com.newfivefour.natcher.uicomponent.EmptiableComponent;
+import com.newfivefour.natcher.uicomponent.Refreshable;
 
-public class NatcherFragment extends android.app.Fragment
-    implements LoadingComponent {
+public class NatcherFragment extends android.app.Fragment {
 
     private NatcherPresenter mPresenter;
     private RecentPostsView mRecentPostsView;
@@ -24,14 +22,12 @@ public class NatcherFragment extends android.app.Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPresenter = new NatcherPresenter(this);
-        mWindowLoadingSpinnerDelegate = new WindowLoadingSpinner(getActivity());
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mPresenter = null;
-        mWindowLoadingSpinnerDelegate = null;
     }
 
     @Override
@@ -39,7 +35,7 @@ public class NatcherFragment extends android.app.Fragment
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.natcher_fragment, container, false);
         mRecentPostsView = (RecentPostsView) v.findViewById(R.id.natcher_listview);
-        mRecentPostsView.getUiComponentDelegate().setRefreshConnector(new RefreshableComponent() {
+        mRecentPostsView.getUiComponentDelegate().setRefreshableConnector(new Refreshable() {
             @Override
             public void onRefreshContent() {
                 mPresenter.recentPostsFetch();
@@ -51,7 +47,6 @@ public class NatcherFragment extends android.app.Fragment
                 Toast.makeText(getActivity(), "Yeah, it's empty.", Toast.LENGTH_LONG).show();
             }
         });
-        mRecentPostsView.getUiComponentDelegate().setPageWideLoadingConnector(this);
         return v;
     }
 
@@ -90,10 +85,6 @@ public class NatcherFragment extends android.app.Fragment
     public void setRecentPostsError(String s, int responseCode) {
         mRecentPostsView.getUiComponentDelegate().populateFromServerError(responseCode);
         Toast.makeText(getActivity(), s, Toast.LENGTH_LONG).show();
-    }
-
-    public void loadingStart(boolean start) {
-        mWindowLoadingSpinnerDelegate.loadingStart(start);
     }
 
 }
