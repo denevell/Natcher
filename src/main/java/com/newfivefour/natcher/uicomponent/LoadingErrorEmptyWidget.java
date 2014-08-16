@@ -32,6 +32,11 @@ public class LoadingErrorEmptyWidget implements
             mLoading.setLayoutParams(params);
             mError.setLayoutParams(params);
             mEmpty.setLayoutParams(params);
+        } else if (view instanceof ViewGroup) {
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            mLoading.setLayoutParams(params);
+            mError.setLayoutParams(params);
+            mEmpty.setLayoutParams(params);
         }
         // Add views
         view.addView(mLoading);

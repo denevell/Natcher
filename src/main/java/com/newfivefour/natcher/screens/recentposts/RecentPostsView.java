@@ -1,9 +1,12 @@
 package com.newfivefour.natcher.screens.recentposts;
 
 import android.content.Context;
+import android.os.Handler;
 import android.os.Parcelable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -35,6 +38,32 @@ public class RecentPostsView extends FrameLayout implements
                 R.layout.loading_layout,
                 R.layout.error_container,
                 R.layout.empty_container);
+        final SwipeRefreshLayout swipe = (SwipeRefreshLayout) findViewById(R.id.swipe);
+        swipe.setColorScheme(
+                android.R.color.holo_red_light, android.R.color.holo_red_light,
+                android.R.color.holo_green_light, android.R.color.holo_green_light
+        );
+        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override public void onRefresh() {
+                  new Handler().postDelayed(new Runnable() {
+                      @Override
+                      public void run() {
+                        swipe.setRefreshing(false);
+                      }
+                  }, 2500);
+            }
+        });
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override public void onScrollStateChanged(AbsListView view, int scrollState) {}
+
+            @Override public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if(firstVisibleItem==0) {
+                    swipe.setEnabled(true);
+                } else {
+                    swipe.setEnabled(false);
+                }
+            }
+        });
     }
 
     @SuppressWarnings("unused")
@@ -70,4 +99,5 @@ public class RecentPostsView extends FrameLayout implements
     public void clearExistingContent() {
         mListView.setAdapter(null);
     }
+
 }
