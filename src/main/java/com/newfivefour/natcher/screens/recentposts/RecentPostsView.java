@@ -32,7 +32,7 @@ public class RecentPostsView extends FrameLayout implements
             .setConnector(this)
             .setErrorEmptyLoading(
                 this,
-                R.layout.loading_layout,
+                -1,
                 R.layout.error_container,
                 R.layout.empty_container);
     }

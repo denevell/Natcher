@@ -119,7 +119,6 @@ import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
  * Given we set a is empty callback
  * Then the widget that deals with errors and empty views is given that
  *
- * ### TODO: Change  swipe to refresh so it's the in-component widget loader too
  * ### TODO: A page wide loader that keeps tracks from loads, and stops on zero
  *
  * ### QUESTION: Show fragment server error along with component server error?
@@ -153,6 +152,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     private LoadingErrorEmptyWidget mInComponentLoadingErrorWidget;
     private LoadingComponent mPageWideLoader;
     private RefreshableConnector mRefreshWidget;
+    private LoadingComponent mInComponentLoading;
 
     /**
      * Used to communicate with whatever is using this as a delegate
@@ -180,6 +180,11 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
 
     public UiComponentVanilla() {}
 
+    /**
+     * @param loadingLayout < 0 means don't set
+     * @param errorLayout < 0 means don't set
+     * @param emptyLayout < 0 means don't set
+     */
     public UiComponentVanilla<T> setErrorEmptyLoading(
         ViewGroup parent,
         int loadingLayout,
@@ -191,6 +196,14 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
                 errorLayout,
                 emptyLayout
         );
+        return this;
+    }
+
+    /***
+     * This can be instead of, or in addition to, that which is set in setErrorEmptyLoading()
+     */
+    public UiComponentVanilla<T> setInComponentLoadingWidget(LoadingComponent loadingComponent) {
+        mInComponentLoading = loadingComponent;
         return this;
     }
 
@@ -214,7 +227,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setEmptyError(false);
         setServerError(false);
         if(mPopulatable.isContentEmpty()) {
-            mInComponentLoadingErrorWidget.showLoading(true);
+            setLoading(true);
         } else {
             setPageWideLoading(true);
         }
@@ -307,6 +320,9 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     private void setLoading(boolean show) {
         if(mInComponentLoadingErrorWidget !=null) {
             mInComponentLoadingErrorWidget.showLoading(show);
+        }
+        if(mInComponentLoading!=null) {
+            mInComponentLoading.loadingStart(show);
         }
     }
 

@@ -14,75 +14,81 @@ import com.newfivefour.natcher.uicomponent.RefreshableConnector;
 public class LoadingErrorEmptyWidget implements
         RefreshableConnector,
         EmptiableContentConnector {
-    private final View mError;
-    private final View mEmpty;
+    private View mError;
+    private View mEmpty;
     private View mLoading;
+
+    public LoadingErrorEmptyWidget(ViewGroup view,
+                                   int errorLayout,
+                                   int emptyLayout) {
+        this(view, -1, errorLayout, emptyLayout);
+    }
 
     public LoadingErrorEmptyWidget(ViewGroup view,
                                    int loadingLayout,
                                    int errorLayout,
                                    int emptyLayout) {
         // Load views
-        mLoading = LayoutInflater.from(view.getContext()).inflate(loadingLayout, view, false);
-        mEmpty = LayoutInflater.from(view.getContext()).inflate(emptyLayout, view, false);
-        mError = LayoutInflater.from(view.getContext()).inflate(errorLayout, view, false);
+        if(loadingLayout>0) {
+            mLoading = LayoutInflater.from(view.getContext()).inflate(loadingLayout, view, false);
+        }
+        if(emptyLayout>0) {
+            mEmpty = LayoutInflater.from(view.getContext()).inflate(emptyLayout, view, false);
+        }
+        if(errorLayout>0) {
+            mError = LayoutInflater.from(view.getContext()).inflate(errorLayout, view, false);
+        }
         // Set layout params
         if (view instanceof FrameLayout) {
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            mLoading.setLayoutParams(params);
-            mError.setLayoutParams(params);
-            mEmpty.setLayoutParams(params);
+            setLayoutParams(mLoading, params);
+            setLayoutParams(mError, params);
+            setLayoutParams(mEmpty, params);
         } else if (view instanceof RelativeLayout) {
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            mLoading.setLayoutParams(params);
-            mError.setLayoutParams(params);
-            mEmpty.setLayoutParams(params);
+            setLayoutParams(mLoading, params);
+            setLayoutParams(mError, params);
+            setLayoutParams(mEmpty, params);
         } else if (view instanceof ViewGroup) {
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            mLoading.setLayoutParams(params);
-            mError.setLayoutParams(params);
-            mEmpty.setLayoutParams(params);
+            setLayoutParams(mLoading, params);
+            setLayoutParams(mError, params);
+            setLayoutParams(mEmpty, params);
         }
         // Add views
-        view.addView(mLoading);
-        view.addView(mError);
-        view.addView(mEmpty);
-        mLoading.setVisibility(View.INVISIBLE);
-        mError.setVisibility(View.INVISIBLE);
-        mEmpty.setVisibility(View.INVISIBLE);
+        if(mLoading!=null) {
+            view.addView(mLoading);
+        }
+        if(mEmpty!=null) {
+            view.addView(mEmpty);
+        }
+        if(mError!=null) {
+            view.addView(mError);
+        }
+        setVisibleOrInvisible(mLoading, true);
+        setVisibleOrInvisible(mError, true);
+        setVisibleOrInvisible(mEmpty, true);
     }
 
     public void showLoading(boolean show) {
-       if(show) {
-           mLoading.setVisibility(View.VISIBLE);
-       } else {
-           mLoading.setVisibility(View.INVISIBLE);
-       }
+        setVisibleOrInvisible(mLoading, show);
     }
 
     public void showError(boolean show) {
-        if(show) {
-            mError.setVisibility(View.VISIBLE);
-        } else {
-            mError.setVisibility(View.INVISIBLE);
-        }
+        setVisibleOrInvisible(mError, show);
     }
 
     public void showEmpty(boolean show) {
-        if(show) {
-            mEmpty.setVisibility(View.VISIBLE);
-        } else {
-            mEmpty.setVisibility(View.INVISIBLE);
-        }
+        setVisibleOrInvisible(mEmpty, show);
     }
 
     @Override
     public void setRefreshableConnector(final Refreshable connector) {
         if(connector==null) return;
-        if(mError instanceof RefreshableConnector) {
+        if(mError!=null && mError instanceof RefreshableConnector) {
             ((RefreshableConnector)mError).setRefreshableConnector(connector);
         }
-        if(mEmpty instanceof RefreshableConnector) {
+        if(mEmpty !=null && mEmpty instanceof RefreshableConnector) {
             ((RefreshableConnector)mEmpty).setRefreshableConnector(connector);
         }
     }
@@ -90,8 +96,22 @@ public class LoadingErrorEmptyWidget implements
     @Override
     public void setEmptyConnector(EmptiableComponent connector) {
         if(connector==null) return;
-        if(mEmpty instanceof EmptiableContentConnector) {
+        if(mEmpty !=null && mEmpty instanceof EmptiableContentConnector) {
             ((EmptiableContentConnector)mEmpty).setEmptyConnector(connector);
         }
+    }
+
+    private void setVisibleOrInvisible(View v, boolean show) {
+        if(v==null) return;
+        if(show) {
+           v.setVisibility(View.VISIBLE);
+        } else {
+            v.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void setLayoutParams(View v, ViewGroup.LayoutParams params) {
+        if(v==null || params==null) return;
+        mEmpty.setLayoutParams(params);
     }
 }

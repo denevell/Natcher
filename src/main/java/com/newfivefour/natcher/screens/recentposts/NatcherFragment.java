@@ -42,6 +42,7 @@ public class NatcherFragment extends android.app.Fragment {
         SwipeToRefreshWidget swipe = new SwipeToRefreshWidget((SwipeRefreshLayout) getActivity().findViewById(R.id.swipe));
         mRecentPostsView.getUiComponentDelegate().setRefreshWidget(swipe);
         mRecentPostsView.getUiComponentDelegate().setPageWideLoadingConnector(swipe);
+        mRecentPostsView.getUiComponentDelegate().setInComponentLoadingWidget(swipe);
 
         mRecentPostsView.getUiComponentDelegate().setRefreshableConnector(new Refreshable() {
             @Override
