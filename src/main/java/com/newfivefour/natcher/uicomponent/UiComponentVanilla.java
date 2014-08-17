@@ -120,6 +120,7 @@ import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
  * Then the widget that deals with errors and empty views is given that
  *
  * ### TODO: Attempt to put swipe to refresh up the layout hierarchy.
+ * ### TODO: Change  swipe to refresh so it's the in-component widget loader too
  * ### TODO: A page wide loader that keeps tracks from loads, and stops on zero
  *
  * ### QUESTION: Show fragment server error along with component server error?

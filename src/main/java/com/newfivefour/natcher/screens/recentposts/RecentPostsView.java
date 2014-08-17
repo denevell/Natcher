@@ -12,19 +12,17 @@ import android.widget.ListView;
 
 import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.services.PostsRecentService;
-import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
 import com.newfivefour.natcher.uicomponent.Populatable;
-import com.newfivefour.natcher.uicomponent.widgets.SwipeToRefreshWidget;
 import com.newfivefour.natcher.uicomponent.UiComponent;
 import com.newfivefour.natcher.uicomponent.UiComponentDelegate;
 import com.newfivefour.natcher.uicomponent.UiComponentVanilla;
+import com.newfivefour.natcher.uicomponent.widgets.SwipeToRefreshWidget;
 
 public class RecentPostsView extends FrameLayout implements
         UiComponentDelegate<PostsRecentService.RecentPosts>,
         Populatable<PostsRecentService.RecentPosts> {
 
     private UiComponent<PostsRecentService.RecentPosts> mUIComponent;
-    private LoadingErrorEmptyWidget mInComponentLoadingErrorWidget;
     private ListView mListView;
 
     public RecentPostsView(Context context, AttributeSet attrs, int defStyle) {
