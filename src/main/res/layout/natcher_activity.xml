@@ -1,3 +1,10 @@
+<com.newfivefour.natcher.customviews.SwipeRefreshLayoutWithListViewFinder
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipe"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
 <com.newfivefour.natcher.app.swiping.TouchableRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -32,3 +39,4 @@
         android:layout_centerHorizontal="true" />
 
 </com.newfivefour.natcher.app.swiping.TouchableRelativeLayout>
+</com.newfivefour.natcher.customviews.SwipeRefreshLayoutWithListViewFinder>

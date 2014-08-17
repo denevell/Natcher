@@ -119,7 +119,6 @@ import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
  * Given we set a is empty callback
  * Then the widget that deals with errors and empty views is given that
  *
- * ### TODO: Attempt to put swipe to refresh up the layout hierarchy.
  * ### TODO: Change  swipe to refresh so it's the in-component widget loader too
  * ### TODO: A page wide loader that keeps tracks from loads, and stops on zero
  *

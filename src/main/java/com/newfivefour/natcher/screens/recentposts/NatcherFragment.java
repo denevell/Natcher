@@ -1,12 +1,14 @@
 package com.newfivefour.natcher.screens.recentposts;
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.newfivefour.natcher.R;
+import com.newfivefour.natcher.uicomponent.widgets.SwipeToRefreshWidget;
 import com.newfivefour.natcher.uicomponent.widgets.WindowLoadingSpinnerWidget;
 import com.newfivefour.natcher.services.PostsRecentService;
 import com.newfivefour.natcher.uicomponent.EmptiableComponent;
@@ -35,6 +37,12 @@ public class NatcherFragment extends android.app.Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.natcher_fragment, container, false);
         mRecentPostsView = (RecentPostsView) v.findViewById(R.id.natcher_listview);
+
+        // Setup the swipe view
+        SwipeToRefreshWidget swipe = new SwipeToRefreshWidget((SwipeRefreshLayout) getActivity().findViewById(R.id.swipe));
+        mRecentPostsView.getUiComponentDelegate().setRefreshWidget(swipe);
+        mRecentPostsView.getUiComponentDelegate().setPageWideLoadingConnector(swipe);
+
         mRecentPostsView.getUiComponentDelegate().setRefreshableConnector(new Refreshable() {
             @Override
             public void onRefreshContent() {

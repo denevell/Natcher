@@ -2,7 +2,6 @@ package com.newfivefour.natcher.screens.recentposts;
 
 import android.content.Context;
 import android.os.Parcelable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,26 +12,20 @@ import android.widget.ListView;
 import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.services.PostsRecentService;
 import com.newfivefour.natcher.uicomponent.Populatable;
-import com.newfivefour.natcher.uicomponent.UiComponent;
 import com.newfivefour.natcher.uicomponent.UiComponentDelegate;
 import com.newfivefour.natcher.uicomponent.UiComponentVanilla;
-import com.newfivefour.natcher.uicomponent.widgets.SwipeToRefreshWidget;
 
 public class RecentPostsView extends FrameLayout implements
         UiComponentDelegate<PostsRecentService.RecentPosts>,
         Populatable<PostsRecentService.RecentPosts> {
 
-    private UiComponent<PostsRecentService.RecentPosts> mUIComponent;
+    private UiComponentVanilla<PostsRecentService.RecentPosts> mUIComponent;
     private ListView mListView;
 
     public RecentPostsView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         View rootView = LayoutInflater.from(context).inflate(R.layout.natcher_listview, this, true);
         mListView = (ListView) rootView.findViewById(R.id.listView);
-
-        // Setup the swipe view
-        SwipeToRefreshWidget swipe = new SwipeToRefreshWidget((SwipeRefreshLayout) findViewById(R.id.swipe));
-        swipe.fixListView(mListView);
 
         // Setup ui component
         mUIComponent = new UiComponentVanilla<PostsRecentService.RecentPosts>()
@@ -41,9 +34,7 @@ public class RecentPostsView extends FrameLayout implements
                 this,
                 R.layout.loading_layout,
                 R.layout.error_container,
-                R.layout.empty_container)
-            .setRefreshWidget(swipe);
-        mUIComponent.setPageWideLoadingConnector(swipe);
+                R.layout.empty_container);
     }
 
     @SuppressWarnings("unused")
@@ -52,7 +43,7 @@ public class RecentPostsView extends FrameLayout implements
     }
 
     @Override
-    public UiComponent<PostsRecentService.RecentPosts> getUiComponentDelegate() {
+    public UiComponentVanilla<PostsRecentService.RecentPosts> getUiComponentDelegate() {
         return mUIComponent;
     }
 
