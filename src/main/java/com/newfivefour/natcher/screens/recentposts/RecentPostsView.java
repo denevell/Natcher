@@ -2,6 +2,7 @@ package com.newfivefour.natcher.screens.recentposts;
 
 import android.content.Context;
 import android.os.Parcelable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,15 +29,11 @@ public class RecentPostsView extends FrameLayout implements
 
     public RecentPostsView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-
-        SwipeToRefreshWidget swipe = new SwipeToRefreshWidget(context, attrs);
-        addView(swipe);
-
-        View rootView = LayoutInflater.from(context).inflate(R.layout.natcher_listview, this, false);
-        swipe.addView(rootView);
-
-        // Get the ListView
+        View rootView = LayoutInflater.from(context).inflate(R.layout.natcher_listview, this, true);
         mListView = (ListView) rootView.findViewById(R.id.listView);
+
+        // Setup the swipe view
+        SwipeToRefreshWidget swipe = new SwipeToRefreshWidget((SwipeRefreshLayout) findViewById(R.id.swipe));
         swipe.fixListView(mListView);
 
         // Setup ui component
@@ -62,7 +59,7 @@ public class RecentPostsView extends FrameLayout implements
     }
 
     @Override
-    public void populate(PostsRecentService.RecentPosts ob) {
+    public void populateWithContent(PostsRecentService.RecentPosts ob) {
         ArrayAdapter<PostsRecentService.RecentPosts.Post> adapter = new ArrayAdapter<>(
                 getContext(),
                 R.layout.post_list_item,
@@ -76,12 +73,12 @@ public class RecentPostsView extends FrameLayout implements
     }
 
     @Override
-    public boolean hasEmptyContent() {
+    public boolean isContentEmpty() {
         return mListView.getAdapter() == null || mListView.getAdapter().getCount() == 0;
     }
 
     @Override
-    public void clearExistingContent() {
+    public void clearContent() {
         mListView.setAdapter(null);
     }
 

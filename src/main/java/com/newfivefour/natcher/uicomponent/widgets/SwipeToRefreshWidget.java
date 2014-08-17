@@ -1,28 +1,18 @@
 package com.newfivefour.natcher.uicomponent.widgets;
 
-import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.AttributeSet;
 import android.widget.AbsListView;
 
 import com.newfivefour.natcher.uicomponent.LoadingComponent;
 import com.newfivefour.natcher.uicomponent.Refreshable;
 import com.newfivefour.natcher.uicomponent.RefreshableConnector;
 
-public class SwipeToRefreshWidget extends SwipeRefreshLayout
-        implements RefreshableConnector, LoadingComponent {
-    public SwipeToRefreshWidget(Context context) {
-        this(context, null);
-    }
+public class SwipeToRefreshWidget implements RefreshableConnector, LoadingComponent {
+    private final SwipeRefreshLayout mSwipe;
 
-    public SwipeToRefreshWidget(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    @Override
-    public void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        setColorScheme(
+    public SwipeToRefreshWidget(SwipeRefreshLayout swipe) {
+        mSwipe = swipe;
+        mSwipe.setColorScheme(
                 android.R.color.holo_red_light, android.R.color.holo_red_light,
                 android.R.color.holo_green_light, android.R.color.holo_green_light
         );
@@ -37,9 +27,9 @@ public class SwipeToRefreshWidget extends SwipeRefreshLayout
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (firstVisibleItem == 0) {
-                    setEnabled(true);
+                    mSwipe.setEnabled(true);
                 } else {
-                    setEnabled(false);
+                    mSwipe.setEnabled(false);
                 }
             }
         });
@@ -48,7 +38,7 @@ public class SwipeToRefreshWidget extends SwipeRefreshLayout
 
     @Override
     public void setRefreshableConnector(final Refreshable connector) {
-        setOnRefreshListener(new OnRefreshListener() {
+        mSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 connector.onRefreshContent();
@@ -59,9 +49,9 @@ public class SwipeToRefreshWidget extends SwipeRefreshLayout
     @Override
     public void loadingStart(boolean start) {
         if(start) {
-            setRefreshing(true);
+            mSwipe.setRefreshing(true);
         } else {
-            setRefreshing(false);
+            mSwipe.setRefreshing(false);
         }
     }
 }

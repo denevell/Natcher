@@ -119,6 +119,9 @@ import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
  * Given we set a is empty callback
  * Then the widget that deals with errors and empty views is given that
  *
+ * ### TODO: Attempt to put swipe to refresh up the layout hierarchy.
+ * ### TODO: A page wide loader that keeps tracks from loads, and stops on zero
+ *
  * ### QUESTION: Show fragment server error along with component server error?
  * ### ANSWER:   At the moment, the fragment doesn't know if the component will
  * ###           show an error on networking problem, so it does so anyway. The
@@ -210,7 +213,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         mShouldStartPageLoaderAfterCachedResult = true;
         setEmptyError(false);
         setServerError(false);
-        if(mPopulatable.hasEmptyContent()) {
+        if(mPopulatable.isContentEmpty()) {
             mInComponentLoadingErrorWidget.showLoading(true);
         } else {
             setPageWideLoading(true);
@@ -220,7 +223,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateFromCache(T ob) {
         Log.d(TAG, "populateFromCache()");
-        mPopulatable.populate(ob);
+        mPopulatable.populateWithContent(ob);
         setLoading(false);
         setServerError(false);
         setEmptyError(false);
@@ -234,7 +237,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     public void populateFromServer(T ob) {
         Log.d(TAG, "populateFromServer()");
         mShouldStartPageLoaderAfterCachedResult = false;
-        mPopulatable.populate(ob);
+        mPopulatable.populateWithContent(ob);
         setPageWideLoading(false);
         setLoading(false);
         setServerError(false);
@@ -245,7 +248,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     public void populateFromServerError(int responseCode) {
         Log.d(TAG, "populateFromServerError()");
         mShouldStartPageLoaderAfterCachedResult = false;
-        if(mPopulatable.hasEmptyContent()) {
+        if(mPopulatable.isContentEmpty()) {
             Log.d(TAG, "populateFromServerError(): empty view content");
             setServerError(true);
         } else {
@@ -260,7 +263,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateWithEmptyContentFromServer() {
         Log.d(TAG, "populateWithEmptyContentFromServer()");
-        mPopulatable.clearExistingContent();
+        mPopulatable.clearContent();
         setPageWideLoading(false);
         setLoading(false);
         setServerError(false);
@@ -270,7 +273,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateWithEmptyContentFromCache() {
         Log.d(TAG, "populateWithEmptyContentFromCache()");
-        mPopulatable.clearExistingContent();
+        mPopulatable.clearContent();
         setLoading(false);
         setServerError(false);
         setEmptyError(true);

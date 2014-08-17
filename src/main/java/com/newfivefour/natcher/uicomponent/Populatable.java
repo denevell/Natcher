@@ -7,5 +7,5 @@ package com.newfivefour.natcher.uicomponent;
  * 3. How to clear that view on empty content from server
  */
 public interface Populatable<T> extends HasEmptyContent {
-    void populate(T ob);
+    void populateWithContent(T ob);
 }
