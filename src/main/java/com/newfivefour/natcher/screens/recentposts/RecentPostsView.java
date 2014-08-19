@@ -18,6 +18,7 @@ import com.newfivefour.natcher.uicomponent.UiComponentDelegate;
 import com.newfivefour.natcher.uicomponent.UiComponentVanilla;
 import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
 import com.newfivefour.natcher.uicomponent.widgets.SwipeToRefreshWidget;
+import com.newfivefour.natcher.uicomponent.widgets.TextViewServerErrorWidget;
 import com.newfivefour.natcher.uicomponent.widgets.WindowLoadingSpinnerWidget;
 
 public class RecentPostsView extends FrameLayout implements
@@ -40,9 +41,10 @@ public class RecentPostsView extends FrameLayout implements
         LoadingErrorEmptyWidget loadingErrorEmptyWidget = new LoadingErrorEmptyWidget(this, -1, R.layout.error_container, R.layout.empty_container);
         mUIComponent = new UiComponentVanilla<>(this);
         mUIComponent
+            .setInComponentLoadingDisplay(swipe)
             .setInComponentEmptyDisplay(loadingErrorEmptyWidget)
             .setInComponentServerErrorDisplay(loadingErrorEmptyWidget)
-            .setInComponentLoadingDisplay(swipe)
+            .setInComponentServerErrorDisplayForUseWhenWeHaveContent(new TextViewServerErrorWidget(getContext().getApplicationContext()))
             .setPageWideLoadingDisplay(new WindowLoadingSpinnerWidget((Activity) getContext()))
             .setRefreshWidget(swipe);
     }
