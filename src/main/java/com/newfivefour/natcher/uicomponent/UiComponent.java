@@ -1,5 +1,9 @@
 package com.newfivefour.natcher.uicomponent;
 
+import com.newfivefour.natcher.uicomponent.events.OnEmptyConnector;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshConnector;
+import com.newfivefour.natcher.uicomponent.views.LoadingView;
+
 /**
  * Allows your component to enjoy all the goodness of a UiComponent
  * i.e. dealing with loading views, error views, empty views, cached content,
@@ -8,10 +12,8 @@ package com.newfivefour.natcher.uicomponent;
  * @see com.newfivefour.natcher.uicomponent.UiComponentVanilla
  */
 public interface UiComponent<T> extends
-        PopulatableComponent<T>,
-        ParentLoadingConnector,
-        RefreshableConnector,
-        EmptiableContentConnector {
+        OnRefreshConnector,
+        OnEmptyConnector {
 
     /**
      * Called when the component is destroyed.
@@ -23,4 +25,19 @@ public interface UiComponent<T> extends
      * chance to dis-activate as yet, since the network hasn't returned.
      */
     void onResetComponent();
+
+    /**
+     * The component may want to set a loader for the overall page, in addition to
+     * the loader is this component.
+     *
+     * If it's set, it only shows when there's cached content, and we're refreshing.
+     */
+    UiComponent<T> setPageWideLoadingDisplay(LoadingView loadingView);
+
+    void populateStarting();
+    void populateFromCache(T ob);
+    void populateFromServer(T ob);
+    void populateFromServerError(int responseCode);
+    void populateWithEmptyContentFromServer();
+    void populateWithEmptyContentFromCache();
 }

@@ -9,8 +9,8 @@ import android.widget.Toast;
 
 import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.services.PostsRecentService;
-import com.newfivefour.natcher.uicomponent.EmptiableComponent;
-import com.newfivefour.natcher.uicomponent.Refreshable;
+import com.newfivefour.natcher.uicomponent.events.OnEmpty;
+import com.newfivefour.natcher.uicomponent.events.OnRefresh;
 import com.newfivefour.natcher.uicomponent.widgets.WindowLoadingSpinnerWidget;
 
 public class NatcherFragment extends android.app.Fragment {
@@ -38,14 +38,14 @@ public class NatcherFragment extends android.app.Fragment {
         View v = inflater.inflate(R.layout.natcher_fragment, container, false);
         mRecentPostsView = (RecentPostsView) v.findViewById(R.id.natcher_listview);
 
-        mRecentPostsView.getUiComponentDelegate().setRefreshableConnector(new Refreshable() {
+        mRecentPostsView.getUiComponentDelegate().setRefreshableConnector(new OnRefresh() {
             @Override
             public void onRefreshContent() {
                 Log.d(TAG, "onRefreshContent()");
                 mPresenter.recentPostsFetch();
             }
         });
-        mRecentPostsView.getUiComponentDelegate().setEmptyConnector(new EmptiableComponent() {
+        mRecentPostsView.getUiComponentDelegate().setEmptyConnector(new OnEmpty() {
             @Override
             public void onIsEmpty() {
                 Toast.makeText(getActivity(), "Yeah, it's empty.", Toast.LENGTH_LONG).show();
@@ -64,7 +64,7 @@ public class NatcherFragment extends android.app.Fragment {
     public void onPause() {
         super.onPause();
         mPresenter.onPause();
-        mRecentPostsView.getUiComponentDelegate().onPause();
+        mRecentPostsView.getUiComponentDelegate().onResetComponent();
     }
 
     public void setRecentPostsLoadingStart() {

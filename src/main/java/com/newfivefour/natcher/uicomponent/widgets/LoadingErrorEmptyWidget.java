@@ -6,30 +6,42 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.newfivefour.natcher.uicomponent.EmptiableComponent;
-import com.newfivefour.natcher.uicomponent.EmptiableContentConnector;
-import com.newfivefour.natcher.uicomponent.EmptyComponent;
-import com.newfivefour.natcher.uicomponent.LoadingComponent;
-import com.newfivefour.natcher.uicomponent.Refreshable;
-import com.newfivefour.natcher.uicomponent.RefreshableConnector;
-import com.newfivefour.natcher.uicomponent.ServerErrorComponent;
+import com.newfivefour.natcher.uicomponent.events.OnEmpty;
+import com.newfivefour.natcher.uicomponent.events.OnEmptyConnector;
+import com.newfivefour.natcher.uicomponent.events.OnRefresh;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshConnector;
+import com.newfivefour.natcher.uicomponent.views.EmptyView;
+import com.newfivefour.natcher.uicomponent.views.LoadingView;
+import com.newfivefour.natcher.uicomponent.views.ServerErrorView;
 
+/**
+ * Can be used a LoadingView, ServerErrorView and EmptyView as a quick
+ * one-stop shop when setting up a UiComponen.
+ */
 public class LoadingErrorEmptyWidget implements
-        RefreshableConnector,
-        EmptiableContentConnector,
-        LoadingComponent,
-        EmptyComponent,
-        ServerErrorComponent {
+        OnRefreshConnector,
+        OnEmptyConnector,
+        LoadingView,
+        EmptyView,
+        ServerErrorView {
     private View mError;
     private View mEmpty;
     private View mLoading;
 
+    /**
+     * @param errorLayout Should be something that implements OnRefreshConnector to receive a callback about refreshes
+     * @param emptyLayout Should be something that implements On{Refresh,Empty}Connector to receive such callback
+     */
     public LoadingErrorEmptyWidget(ViewGroup view,
                                    int errorLayout,
                                    int emptyLayout) {
         this(view, -1, errorLayout, emptyLayout);
     }
 
+    /**
+     * @param errorLayout Should be something that implements OnRefreshConnector to receive a callback about refreshes
+     * @param emptyLayout Should be something that implements On{Refresh,Empty}Connector to receive such callback
+     */
     public LoadingErrorEmptyWidget(ViewGroup view,
                                    int loadingLayout,
                                    int errorLayout,
@@ -77,36 +89,36 @@ public class LoadingErrorEmptyWidget implements
     }
 
     @Override
-    public void loading(boolean start) {
+    public void showLoading(boolean start) {
         setVisibleOrInvisible(mLoading, start);
     }
 
     @Override
-    public void empty(boolean empty) {
+    public void showEmpty(boolean empty) {
         setVisibleOrInvisible(mEmpty, empty);
     }
 
     @Override
-    public void serverError(boolean show) {
+    public void showServerError(boolean show) {
         setVisibleOrInvisible(mError, show);
     }
 
     @Override
-    public void setRefreshableConnector(final Refreshable connector) {
+    public void setRefreshableConnector(final OnRefresh connector) {
         if(connector==null) return;
-        if(mError!=null && mError instanceof RefreshableConnector) {
-            ((RefreshableConnector)mError).setRefreshableConnector(connector);
+        if(mError!=null && mError instanceof OnRefreshConnector) {
+            ((OnRefreshConnector)mError).setRefreshableConnector(connector);
         }
-        if(mEmpty !=null && mEmpty instanceof RefreshableConnector) {
-            ((RefreshableConnector)mEmpty).setRefreshableConnector(connector);
+        if(mEmpty !=null && mEmpty instanceof OnRefreshConnector) {
+            ((OnRefreshConnector)mEmpty).setRefreshableConnector(connector);
         }
     }
 
     @Override
-    public void setEmptyConnector(EmptiableComponent connector) {
+    public void setEmptyConnector(OnEmpty connector) {
         if(connector==null) return;
-        if(mEmpty !=null && mEmpty instanceof EmptiableContentConnector) {
-            ((EmptiableContentConnector)mEmpty).setEmptyConnector(connector);
+        if(mEmpty !=null && mEmpty instanceof OnEmptyConnector) {
+            ((OnEmptyConnector)mEmpty).setEmptyConnector(connector);
         }
     }
 

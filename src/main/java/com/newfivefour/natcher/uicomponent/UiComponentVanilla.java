@@ -2,6 +2,13 @@ package com.newfivefour.natcher.uicomponent;
 
 import android.util.Log;
 
+import com.newfivefour.natcher.uicomponent.events.OnEmpty;
+import com.newfivefour.natcher.uicomponent.events.OnRefresh;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshConnector;
+import com.newfivefour.natcher.uicomponent.views.EmptyView;
+import com.newfivefour.natcher.uicomponent.views.LoadingView;
+import com.newfivefour.natcher.uicomponent.views.ServerErrorView;
+
 /**
  * Allows your component to enjoy all the goodness of a UiComponent
  * i.e. dealing with loading views, error views, empty views, cached content,
@@ -119,18 +126,18 @@ import android.util.Log;
  * ### ANSWER:   At the moment, the fragment doesn't know if the component will
  * ###           show an error on networking problem, so it does so anyway. The
  * ###           component won't  show one on cached content, but will on no content.
- * ###           To be thought about.
+ * ###           To be thought about. Maybe I need an error on cached content?
  *
  *
  */
 public class UiComponentVanilla<T> implements UiComponent<T> {
     private static String TAG = UiComponentVanilla.class.getSimpleName();
-    private RefreshableConnector mRefreshWidget;
+    private OnRefreshConnector mRefreshWidget;
 
-    private LoadingComponent mPageWideLoader;
-    private LoadingComponent mInComponentLoading;
-    private EmptyComponent mEmptyComponentView;
-    private ServerErrorComponent mServerErrorComponentView;
+    private LoadingView mPageWideLoader;
+    private LoadingView mInComponentLoading;
+    private EmptyView mEmptyViewView;
+    private ServerErrorView mServerErrorComponentView;
 
     /**
      * Used to communicate with whatever is using this as a delegate
@@ -156,49 +163,47 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
      */
     private boolean mShouldStartPageLoaderAfterCachedResult = true;
 
-    public UiComponentVanilla() {}
+    public UiComponentVanilla(Populatable<T> populatable) {
+        mPopulatable = populatable;
+    }
 
-    public UiComponentVanilla<T> setInComponentLoading(LoadingComponent loadingComponent) {
-        mInComponentLoading = loadingComponent;
+    public UiComponentVanilla<T> setInComponentLoadingDisplay(LoadingView loadingView) {
+        mInComponentLoading = loadingView;
         return this;
     }
 
-    public UiComponentVanilla<T> setInComponentEmpty(EmptyComponent emptyComponent) {
-        mEmptyComponentView = emptyComponent;
+    public UiComponentVanilla<T> setInComponentEmptyDisplay(EmptyView emptyView) {
+        mEmptyViewView = emptyView;
         return this;
     }
 
-    public UiComponentVanilla<T> setInComponentServerError(ServerErrorComponent errorComponent) {
+    public UiComponentVanilla<T> setInComponentServerErrorDisplay(ServerErrorView errorComponent) {
         mServerErrorComponentView = errorComponent;
         return this;
     }
 
     /**
-     * @param populatable How we populate the view on server response, detect if it's empty and clear it if needs be
+     * @param refreshWidget This will be given the OnRefresh callback when it's set on the UiComponent
+     * @return
      */
-    public UiComponentVanilla<T> setConnector(Populatable<T> populatable) {
-        mPopulatable = populatable;
-        return this;
-    }
-
-    public UiComponentVanilla<T> setRefreshWidget(RefreshableConnector refreshWidget) {
+    public UiComponentVanilla<T> setRefreshWidget(OnRefreshConnector refreshWidget) {
         mRefreshWidget = refreshWidget;
         return this;
     }
 
     @Override
-    public void setEmptyConnector(EmptiableComponent connector) {
+    public void setEmptyConnector(OnEmpty connector) {
         Log.d(TAG, "setEmptyConnector()");
-        if(mEmptyComponentView!=null) {
-            mEmptyComponentView.setEmptyConnector(connector);
+        if(mEmptyViewView !=null) {
+            mEmptyViewView.setEmptyConnector(connector);
         }
     }
 
     @Override
-    public void setRefreshableConnector(Refreshable connector) {
+    public void setRefreshableConnector(OnRefresh connector) {
         Log.d(TAG, "setRefreshableConnector()");
-        if(mEmptyComponentView!=null) {
-            mEmptyComponentView.setRefreshableConnector(connector);
+        if(mEmptyViewView !=null) {
+            mEmptyViewView.setRefreshableConnector(connector);
         }
         if(mServerErrorComponentView!=null) {
             mServerErrorComponentView.setRefreshableConnector(connector);
@@ -209,9 +214,10 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     }
 
     @Override
-    public void setPageWideLoadingConnector(LoadingComponent loadingComponent) {
-        Log.d(TAG, "setPageWideLoadingConnector()");
-        mPageWideLoader = loadingComponent;
+    public UiComponentVanilla<T> setPageWideLoadingDisplay(LoadingView loadingView) {
+        Log.d(TAG, "setPageWideLoadingDisplay()");
+        mPageWideLoader = loadingView;
+        return this;
     }
 
     @Override
@@ -299,19 +305,19 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
 
     private void setLoading(boolean show) {
         if(mInComponentLoading!=null) {
-            mInComponentLoading.loading(show);
+            mInComponentLoading.showLoading(show);
         }
     }
 
     private void setServerError(boolean show) {
         if(mServerErrorComponentView!=null) {
-            mServerErrorComponentView.serverError(show);
+            mServerErrorComponentView.showServerError(show);
         }
     }
 
     private void setEmptyError(boolean show) {
-        if(mEmptyComponentView!=null) {
-            mEmptyComponentView.empty(show);
+        if(mEmptyViewView !=null) {
+            mEmptyViewView.showEmpty(show);
         }
     }
 
@@ -324,7 +330,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
                 return;
             }
             mPageWideLoadingStarted = show;
-            mPageWideLoader.loading(show);
+            mPageWideLoader.showLoading(show);
         }
     }
 

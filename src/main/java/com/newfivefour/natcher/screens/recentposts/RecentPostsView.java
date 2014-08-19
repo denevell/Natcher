@@ -38,13 +38,13 @@ public class RecentPostsView extends FrameLayout implements
 
         // Setup ui component
         LoadingErrorEmptyWidget loadingErrorEmptyWidget = new LoadingErrorEmptyWidget(this, -1, R.layout.error_container, R.layout.empty_container);
-        mUIComponent = new UiComponentVanilla<PostsRecentService.RecentPosts>()
-            .setConnector(this)
-            .setInComponentEmpty(loadingErrorEmptyWidget)
-            .setInComponentServerError(loadingErrorEmptyWidget)
-            .setRefreshWidget(swipe)
-            .setInComponentLoading(swipe);
-        mUIComponent.setPageWideLoadingConnector(new WindowLoadingSpinnerWidget((Activity)getContext()));
+        mUIComponent = new UiComponentVanilla<>(this);
+        mUIComponent
+            .setInComponentEmptyDisplay(loadingErrorEmptyWidget)
+            .setInComponentServerErrorDisplay(loadingErrorEmptyWidget)
+            .setInComponentLoadingDisplay(swipe)
+            .setPageWideLoadingDisplay(new WindowLoadingSpinnerWidget((Activity) getContext()))
+            .setRefreshWidget(swipe);
     }
 
     @SuppressWarnings("unused")
