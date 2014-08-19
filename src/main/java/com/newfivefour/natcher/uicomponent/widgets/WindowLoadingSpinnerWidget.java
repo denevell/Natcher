@@ -8,6 +8,7 @@ import android.util.Log;
  */
 public class WindowLoadingSpinnerWidget implements com.newfivefour.natcher.uicomponent.LoadingComponent {
 
+    private static int count = 0;
     private static final String TAG = WindowLoadingSpinnerWidget.class.getSimpleName();
     private final Activity mActivity;
 
@@ -16,13 +17,19 @@ public class WindowLoadingSpinnerWidget implements com.newfivefour.natcher.uicom
     }
 
     @Override
-    public void loadingStart(boolean start) {
+    public void loading(boolean start) {
+        if(start) {
+            count++;
+        } else {
+            count--;
+        }
+        Log.d(TAG, "Loading count is: " + count);
         if(mActivity==null) return;
         if(start) {
             Log.d(TAG, "Calling loading start");
             mActivity.setProgressBarIndeterminateVisibility(true);
             mActivity.setProgressBarVisibility(true);
-        } else {
+        } else if(count==0) {
             Log.d(TAG, "Calling loading stop");
             mActivity.setProgressBarIndeterminateVisibility(false);
             mActivity.setProgressBarVisibility(false);

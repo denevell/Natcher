@@ -12,4 +12,15 @@ public interface UiComponent<T> extends
         ParentLoadingConnector,
         RefreshableConnector,
         EmptiableContentConnector {
+
+    /**
+     * Called when the component is destroyed.
+     *
+     * Used to revert all external state changes it's made for itself, but not had
+     * the chance to revert yet.
+     *
+     * An example is setting the overall app loading spinner active, but not had the
+     * chance to dis-activate as yet, since the network hasn't returned.
+     */
+    void onResetComponent();
 }

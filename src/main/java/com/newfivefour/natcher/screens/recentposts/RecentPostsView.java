@@ -1,7 +1,9 @@
 package com.newfivefour.natcher.screens.recentposts;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Parcelable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,9 @@ import com.newfivefour.natcher.services.PostsRecentService;
 import com.newfivefour.natcher.uicomponent.Populatable;
 import com.newfivefour.natcher.uicomponent.UiComponentDelegate;
 import com.newfivefour.natcher.uicomponent.UiComponentVanilla;
+import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
+import com.newfivefour.natcher.uicomponent.widgets.SwipeToRefreshWidget;
+import com.newfivefour.natcher.uicomponent.widgets.WindowLoadingSpinnerWidget;
 
 public class RecentPostsView extends FrameLayout implements
         UiComponentDelegate<PostsRecentService.RecentPosts>,
@@ -27,14 +32,19 @@ public class RecentPostsView extends FrameLayout implements
         View rootView = LayoutInflater.from(context).inflate(R.layout.natcher_listview, this, true);
         mListView = (ListView) rootView.findViewById(R.id.listView);
 
+        // Setup the swipe view
+        Activity activity = ((Activity)getContext());
+        SwipeToRefreshWidget swipe = new SwipeToRefreshWidget((SwipeRefreshLayout) activity.findViewById(R.id.swipe));
+
         // Setup ui component
+        LoadingErrorEmptyWidget loadingErrorEmptyWidget = new LoadingErrorEmptyWidget(this, -1, R.layout.error_container, R.layout.empty_container);
         mUIComponent = new UiComponentVanilla<PostsRecentService.RecentPosts>()
             .setConnector(this)
-            .setErrorEmptyLoading(
-                this,
-                -1,
-                R.layout.error_container,
-                R.layout.empty_container);
+            .setInComponentEmpty(loadingErrorEmptyWidget)
+            .setInComponentServerError(loadingErrorEmptyWidget)
+            .setRefreshWidget(swipe)
+            .setInComponentLoading(swipe);
+        mUIComponent.setPageWideLoadingConnector(new WindowLoadingSpinnerWidget((Activity)getContext()));
     }
 
     @SuppressWarnings("unused")

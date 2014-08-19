@@ -8,12 +8,18 @@ import android.widget.RelativeLayout;
 
 import com.newfivefour.natcher.uicomponent.EmptiableComponent;
 import com.newfivefour.natcher.uicomponent.EmptiableContentConnector;
+import com.newfivefour.natcher.uicomponent.EmptyComponent;
+import com.newfivefour.natcher.uicomponent.LoadingComponent;
 import com.newfivefour.natcher.uicomponent.Refreshable;
 import com.newfivefour.natcher.uicomponent.RefreshableConnector;
+import com.newfivefour.natcher.uicomponent.ServerErrorComponent;
 
 public class LoadingErrorEmptyWidget implements
         RefreshableConnector,
-        EmptiableContentConnector {
+        EmptiableContentConnector,
+        LoadingComponent,
+        EmptyComponent,
+        ServerErrorComponent {
     private View mError;
     private View mEmpty;
     private View mLoading;
@@ -70,16 +76,19 @@ public class LoadingErrorEmptyWidget implements
         setVisibleOrInvisible(mEmpty, true);
     }
 
-    public void showLoading(boolean show) {
-        setVisibleOrInvisible(mLoading, show);
+    @Override
+    public void loading(boolean start) {
+        setVisibleOrInvisible(mLoading, start);
     }
 
-    public void showError(boolean show) {
+    @Override
+    public void empty(boolean empty) {
+        setVisibleOrInvisible(mEmpty, empty);
+    }
+
+    @Override
+    public void serverError(boolean show) {
         setVisibleOrInvisible(mError, show);
-    }
-
-    public void showEmpty(boolean show) {
-        setVisibleOrInvisible(mEmpty, show);
     }
 
     @Override
@@ -114,4 +123,5 @@ public class LoadingErrorEmptyWidget implements
         if(v==null || params==null) return;
         mEmpty.setLayoutParams(params);
     }
+
 }

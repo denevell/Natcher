@@ -1,9 +1,6 @@
 package com.newfivefour.natcher.uicomponent;
 
 import android.util.Log;
-import android.view.ViewGroup;
-
-import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
 
 /**
  * Allows your component to enjoy all the goodness of a UiComponent
@@ -38,25 +35,24 @@ import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
  * Overall page-loader display
  * ###########################
  *
- * # Given populate loading is called
- * Given the component's content is there
+ * Given populate loading is called
+ * Given there is content in the component
  * Then the overall page loading display should be set active
  *
- * # Given cached content is returned
+ * Given the cache returns good content
  * Given a service hasn't returned data
- * Then show the overall page loader
+ * Then the overall page loading display should be set active
  *
- * # Given the server returns good content
+ * Given  the cache return empty content
+ * Given a service hasn't returned data
+ * Then the overall page loading display should be set active
+ *
+ * Given the server returns good content, an error or empty content
  * Then the overall page loading display should be removed
  *
- * # Given the component has received a server error
+ * Given populate loading is called
+ * Given there is no content is the component
  * Then the overall page loading display should be removed
- *
- * # Given we have received empty content from server
- * Then the overall page loading display should be removed
- *
- * # Given we have received empty content from cache
- * Then the overall page loading display should NOT be removed
  *
  * Server error
  * ############
@@ -119,40 +115,22 @@ import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
  * Given we set a is empty callback
  * Then the widget that deals with errors and empty views is given that
  *
- * ### TODO: A page wide loader that keeps tracks from loads, and stops on zero
- *
  * ### QUESTION: Show fragment server error along with component server error?
  * ### ANSWER:   At the moment, the fragment doesn't know if the component will
  * ###           show an error on networking problem, so it does so anyway. The
  * ###           component won't  show one on cached content, but will on no content.
  * ###           To be thought about.
  *
- * ### QUESTION: Calling the populateStarting before getting a response from the server?
- * ### ANSWER:   To be thought about, the page wide boolean and shouldStartPagerLoaderAfterCache.
- * ###           shouldStartPageL... may be problem if it's set to false, and then true by
- * ###           a repeat call, but there'll only be once server response, since the networking
- * ###           code doesn't do repeat requests if the first is already under way. Will see if we do pull to request,
- * ###           meaning we may need to ensure populateStarting isn't called twice for the same request.
  *
- * ### QUESTION: What if we want to refresh the component when it already has data?
- * ### ANSWER:   We need something like pull to refresh or swipe to refresh, by sending it a
- * ###           refreshable connector when the setRefreshableConnector is called on the UiComponent.
- * ###           This, therefore, will be able to run the refresh method at its leisure.
- *
- * ### QUESTION: What about occasions when you don't want to get the data again on rotation etc, only when the user says?
- * ### ANSWER:   In this case, we'll have the page-wide loading spinner keep displaying, since they only are removed
- * ###           when the server returns a result, an error or empty content.
- * ###           We could get around this, outside the component, by simply setting the overall page loader to false
- * ###           after setting the cached content
- * ###           If we were going to do it with the networking message bus service, then we'd need a way to say only give
- * ###           me the cached content. We could alternatively use the response cache object directly.
  */
 public class UiComponentVanilla<T> implements UiComponent<T> {
     private static String TAG = UiComponentVanilla.class.getSimpleName();
-    private LoadingErrorEmptyWidget mInComponentLoadingErrorWidget;
-    private LoadingComponent mPageWideLoader;
     private RefreshableConnector mRefreshWidget;
+
+    private LoadingComponent mPageWideLoader;
     private LoadingComponent mInComponentLoading;
+    private EmptyComponent mEmptyComponentView;
+    private ServerErrorComponent mServerErrorComponentView;
 
     /**
      * Used to communicate with whatever is using this as a delegate
@@ -168,7 +146,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
      * This isn't a problem, per se, since our networking implementation won't be sending out the same requests again,
      * just finishing existing ones.
      */
-    private boolean mPageWideLoadingStarted;
+    private boolean mPageWideLoadingStarted = false;
 
     /**
      * We, as above, don't need to store this to be given to this again on creation.
@@ -180,30 +158,18 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
 
     public UiComponentVanilla() {}
 
-    /**
-     * @param loadingLayout < 0 means don't set
-     * @param errorLayout < 0 means don't set
-     * @param emptyLayout < 0 means don't set
-     */
-    public UiComponentVanilla<T> setErrorEmptyLoading(
-        ViewGroup parent,
-        int loadingLayout,
-        int errorLayout,
-        int emptyLayout) {
-        mInComponentLoadingErrorWidget = new LoadingErrorEmptyWidget(
-                parent,
-                loadingLayout,
-                errorLayout,
-                emptyLayout
-        );
+    public UiComponentVanilla<T> setInComponentLoading(LoadingComponent loadingComponent) {
+        mInComponentLoading = loadingComponent;
         return this;
     }
 
-    /***
-     * This can be instead of, or in addition to, that which is set in setErrorEmptyLoading()
-     */
-    public UiComponentVanilla<T> setInComponentLoadingWidget(LoadingComponent loadingComponent) {
-        mInComponentLoading = loadingComponent;
+    public UiComponentVanilla<T> setInComponentEmpty(EmptyComponent emptyComponent) {
+        mEmptyComponentView = emptyComponent;
+        return this;
+    }
+
+    public UiComponentVanilla<T> setInComponentServerError(ServerErrorComponent errorComponent) {
+        mServerErrorComponentView = errorComponent;
         return this;
     }
 
@@ -221,14 +187,53 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     }
 
     @Override
+    public void setEmptyConnector(EmptiableComponent connector) {
+        Log.d(TAG, "setEmptyConnector()");
+        if(mEmptyComponentView!=null) {
+            mEmptyComponentView.setEmptyConnector(connector);
+        }
+    }
+
+    @Override
+    public void setRefreshableConnector(Refreshable connector) {
+        Log.d(TAG, "setRefreshableConnector()");
+        if(mEmptyComponentView!=null) {
+            mEmptyComponentView.setRefreshableConnector(connector);
+        }
+        if(mServerErrorComponentView!=null) {
+            mServerErrorComponentView.setRefreshableConnector(connector);
+        }
+        if(mRefreshWidget!=null) {
+            mRefreshWidget.setRefreshableConnector(connector);
+        }
+    }
+
+    @Override
+    public void setPageWideLoadingConnector(LoadingComponent loadingComponent) {
+        Log.d(TAG, "setPageWideLoadingConnector()");
+        mPageWideLoader = loadingComponent;
+    }
+
+    @Override
+    public void onResetComponent() {
+        // This will only do so if it's active
+        setPageWideLoading(false);
+        // Not really needed, since we're resetting the component, but may be useful if
+        // the loading is outside the component (naughty)
+        setLoading(false);
+    }
+
+    @Override
     public void populateStarting() {
         Log.d(TAG, "populateStarting()");
         mShouldStartPageLoaderAfterCachedResult = true;
         setEmptyError(false);
         setServerError(false);
         if(mPopulatable.isContentEmpty()) {
+            Log.d(TAG, "populateStarting(): set in-component loading");
             setLoading(true);
         } else {
+            Log.d(TAG, "populateStarting(): set page-wide loading");
             setPageWideLoading(true);
         }
     }
@@ -292,49 +297,21 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setEmptyError(true);
     }
 
-    @Override
-    public void setEmptyConnector(EmptiableComponent connector) {
-        Log.d(TAG, "setEmptyConnector()");
-        if(mInComponentLoadingErrorWidget!=null) {
-            mInComponentLoadingErrorWidget.setEmptyConnector(connector);
-        }
-    }
-
-    @Override
-    public void setRefreshableConnector(Refreshable connector) {
-        Log.d(TAG, "setRefreshableConnector()");
-        if(mInComponentLoadingErrorWidget!=null) {
-            mInComponentLoadingErrorWidget.setRefreshableConnector(connector);
-        }
-        if(mRefreshWidget!=null) {
-            mRefreshWidget.setRefreshableConnector(connector);
-        }
-    }
-
-    @Override
-    public void setPageWideLoadingConnector(LoadingComponent loadingComponent) {
-        Log.d(TAG, "setPageWideLoadingConnector()");
-        mPageWideLoader = loadingComponent;
-    }
-
     private void setLoading(boolean show) {
-        if(mInComponentLoadingErrorWidget !=null) {
-            mInComponentLoadingErrorWidget.showLoading(show);
-        }
         if(mInComponentLoading!=null) {
-            mInComponentLoading.loadingStart(show);
+            mInComponentLoading.loading(show);
         }
     }
 
     private void setServerError(boolean show) {
-        if(mInComponentLoadingErrorWidget!=null) {
-            mInComponentLoadingErrorWidget.showError(show);
+        if(mServerErrorComponentView!=null) {
+            mServerErrorComponentView.serverError(show);
         }
     }
 
     private void setEmptyError(boolean show) {
-        if(mInComponentLoadingErrorWidget!=null) {
-            mInComponentLoadingErrorWidget.showEmpty(show);
+        if(mEmptyComponentView!=null) {
+            mEmptyComponentView.empty(show);
         }
     }
 
@@ -347,7 +324,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
                 return;
             }
             mPageWideLoadingStarted = show;
-            mPageWideLoader.loadingStart(show);
+            mPageWideLoader.loading(show);
         }
     }
 
