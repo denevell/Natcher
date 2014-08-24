@@ -1,5 +1,6 @@
 package com.newfivefour.natcher.uicomponent.widgets;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ public class LoadingErrorEmptyWidget implements
         LoadingView,
         EmptyView,
         ServerErrorView {
+    private static final String TAG = LoadingErrorEmptyWidget.class.getSimpleName();
     private View mError;
     private View mEmpty;
     private View mLoading;
@@ -93,13 +95,14 @@ public class LoadingErrorEmptyWidget implements
     }
 
     @Override
-    public void showLoading(boolean start) {
-        setVisibleOrInvisible(mLoading, start);
+    public void showLoading(boolean show) {
+        Log.d(TAG, "showLoading(): " + show);
+        setVisibleOrInvisible(mLoading, show);
     }
 
     @Override
-    public void showEmpty(boolean empty) {
-        setVisibleOrInvisible(mEmpty, empty);
+    public void showEmpty(boolean show) {
+        setVisibleOrInvisible(mEmpty, show);
     }
 
     @Override

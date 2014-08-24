@@ -29,6 +29,7 @@ public class PostsRecentService {
                                          }
                                      },
                         new RecentPostsEmpty())
+                .create()
                 .fetch(baseUrl,
                         RecentPostsServiceInterface.class,
                         new NetworkingMessageBusService.GetResult<RecentPosts, RecentPostsServiceInterface>() {
@@ -40,10 +41,6 @@ public class PostsRecentService {
                         new RecentPostsError(),
                         RecentPosts.class
                 );
-    }
-
-    public PostsRecentService() {
-        mService = new NetworkingMessageBusService<RecentPosts, RecentPostsServiceInterface>();
     }
 
     public static interface RecentPostsServiceInterface {

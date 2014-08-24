@@ -33,6 +33,12 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
 
     private static final String TAG = NetworkingMessageBusService.class.getSimpleName();
     private static final int SIZE_OF_RESPONSE_CACHE = 10000 * 5;
+    private final CachedResponse<ReturnResult> mCacheResponse;
+    private final String mCachedResponseUri;
+    private final Bundle mRequestUuidBundle;
+    private final IsEmpty mIsEmptyCallback;
+    private final ResponseEmpty mIsEmptyObject;
+    private final Converter mConverter;
 
     public static interface GetResult<ReturnResult, ServiceClass> {
         public ReturnResult getResult(ServiceClass mService) throws Exception;
@@ -63,7 +69,7 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
         private IsEmpty isEmptyCallback;
 
         /**
-        * @param converter The Retrofit converter, GsonConverter normally and by default
+        * @param converter The Retrofit mConverter, GsonConverter normally and by default
         */
         public Builder converter(Converter converter) {
             this.converter = converter;
@@ -109,70 +115,82 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
             return this;
         }
 
-        /**
-         * Fetches an object from an end point
-         *
-         * @param baseUrl      url
-         * @param serviceClass  Retrofit class
-         * @param errorResponse Object we'll send result of an error
-         * @param getResult     Callback that uses the retrofit class to grab the return value
-         */
-        public void fetch(String baseUrl,
-                     Class<ServiceClass> serviceClass,
-                     GetResult<ReturnResult, ServiceClass> getResult,
-                     ResponseError errorResponse,
-                     Class<? extends ReturnResult> returnType) {
-            NetworkingMessageBusService<ReturnResult, ServiceClass> service = new NetworkingMessageBusService<ReturnResult, ServiceClass>();
-            service.fetch(baseUrl,
-                    serviceClass,
-                    converter,
-                    getResult,
-                    errorResponse,
+        public NetworkingMessageBusService<ReturnResult, ServiceClass> create() {
+            NetworkingMessageBusService<ReturnResult, ServiceClass> service = new NetworkingMessageBusService<ReturnResult, ServiceClass>(
                     cacheResponse,
                     cachedResponseUri,
                     requestUuidBundle,
                     isEmptyCallback,
                     isEmptyObject,
-                    returnType);
+                    converter
+            );
+            return service;
         }
+
     }
 
-    private void fetch(final String baseUrl,
+    private NetworkingMessageBusService(
+            CachedResponse<ReturnResult> cacheResponse,
+            String cachedResponseUri,
+            Bundle requestUuidBundle,
+            IsEmpty isEmptyCallback,
+            ResponseEmpty isEmptyObject,
+            Converter converter) {
+        this.mCacheResponse = cacheResponse;
+        this.mCachedResponseUri = cachedResponseUri;
+        this.mRequestUuidBundle = requestUuidBundle;
+        this.mIsEmptyCallback = isEmptyCallback;
+        this.mIsEmptyObject = isEmptyObject;
+        this.mConverter = converter;
+    }
+
+
+    /**
+     * @param bundle The Bundle you passed in with fetch()
+     */
+    public boolean isRequestUnderway(Bundle bundle) {
+        String requestUuid = RequestQueue.getUuidFromBundle(bundle);
+        return RequestQueue.isRequestUnderway(requestUuid);
+    }
+
+    /**
+     * Fetches an object from an end point
+     *
+     * @param baseUrl      url
+     * @param serviceClass  Retrofit class
+     * @param getResult     Callback that uses the retrofit class to grab the return value
+     * @param errorResponse Object we'll send result of an error
+     */
+    public void fetch(final String baseUrl,
                       Class<ServiceClass> serviceClass,
-                      Converter converter,
                       GetResult<ReturnResult, ServiceClass> getResult,
                       ResponseError errorResponse,
-                      CachedResponse<ReturnResult> cacheResponse,
-                      String cachedResponseUri,
-                      Bundle requestUuidBundle,
-                      IsEmpty<ReturnResult> isEmptyCallback,
-                      ResponseEmpty isEmptyObject,
                       Class<? extends ReturnResult> returnType) {
 
         OkClient ok = createHttpClient();
-        ServiceClass service = createServiceClass(baseUrl, serviceClass, converter, ok);
+        ServiceClass service = createServiceClass(baseUrl, serviceClass, mConverter, ok);
 
         // Cached response
         returnCacheIfAvailable(
-                    baseUrl+cachedResponseUri,
-                    cacheResponse,
-                    isEmptyCallback,
-                    isEmptyObject,
+                    baseUrl+ mCachedResponseUri,
+                mCacheResponse,
+                mIsEmptyCallback,
+                mIsEmptyObject,
                     returnType);
 
         // Server response
-        String requestUuid = RequestQueue.getUuidFromBundle(requestUuidBundle);
-        if(RequestQueue.isRequestUnderway(requestUuid)) {
+        if(isRequestUnderway(mRequestUuidBundle)) {
             Log.d(TAG, "We're already fetching it apparently.");
         } else {
+            String requestUuid = RequestQueue.getUuidFromBundle(mRequestUuidBundle);
             returnNetworkResponse(
                     baseUrl,
-                    cachedResponseUri,
+                    mCachedResponseUri,
                     requestUuid,
                     getResult,
                     errorResponse,
-                    isEmptyCallback,
-                    isEmptyObject,
+                    mIsEmptyCallback,
+                    mIsEmptyObject,
                     service,
                     returnType);
         }
@@ -187,12 +205,12 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
                                        final ResponseEmpty isEmptyResponse,
                                        final ServiceClass service,
                                        final Class<? extends ReturnResult> returnType) {
+        RequestQueue.addRequestUuid(requestUuid);
         new AsyncTask<Void, Void, ReturnResult>() {
             @Override
             protected ReturnResult doInBackground(Void... params) {
                 // Now get from network
                 try {
-                    RequestQueue.addRequestUuid(requestUuid);
                     Log.d(TAG, "Attempting to fetch result from base url: " + endPoint);
                     ReturnResult res = getResult.getResult(service);
                     if(cachedResponseUri!=null) {

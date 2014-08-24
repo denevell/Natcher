@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     >
 
-    <com.newfivefour.natcher.screens.enterpost.PostAddView
+    <com.newfivefour.natcher.screens.postadd.PostAddView
         android:id="@+id/add_post_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

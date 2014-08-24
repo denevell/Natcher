@@ -29,6 +29,8 @@ public class RequestQueue {
             Log.d(TAG, "Generating a new request uuid");
             String uuid = UUID.randomUUID().toString();
             existingRequestUuid = uuid;
+        } else {
+            Log.d(TAG, "Existing request UUID: " + existingRequestUuid);
         }
         requestUuidBundle.putString("REQUEST_UUID", existingRequestUuid);
         return existingRequestUuid;
@@ -36,8 +38,10 @@ public class RequestQueue {
 
     public static boolean isRequestUnderway(String requestUuid) {
         if(requestUuid!=null && sCurrentFetches!=null && sCurrentFetches.contains(requestUuid)) {
+            Log.d(TAG, "Request is underway");
             return true;
         } else {
+            Log.d(TAG, "Request is not underway");
             return false;
         }
     }

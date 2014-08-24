@@ -1,4 +1,4 @@
-package com.newfivefour.natcher.screens.recentposts;
+package com.newfivefour.natcher.screens.postsrecent;
 
 import com.newfivefour.natcher.app.Application;
 import com.newfivefour.natcher.app.Presenter;

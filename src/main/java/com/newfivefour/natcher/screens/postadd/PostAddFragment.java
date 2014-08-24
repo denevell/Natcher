@@ -1,6 +1,7 @@
-package com.newfivefour.natcher.screens.enterpost;
+package com.newfivefour.natcher.screens.postadd;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +15,7 @@ import com.newfivefour.natcher.models.PostAdded;
 
 public class PostAddFragment extends android.app.Fragment {
 
+    private static final String TAG = PostAddFragment.class.getSimpleName();
     private PostAddPresenter mPresenter;
     private PostAddView mAddPost;
 
@@ -46,7 +48,9 @@ public class PostAddFragment extends android.app.Fragment {
 
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume");
         super.onResume();
+        mAddPost.createUiComponent();
         mPresenter.onResume();
     }
 
@@ -57,6 +61,7 @@ public class PostAddFragment extends android.app.Fragment {
     }
 
     public void addPostStarted() {
+        Log.d(TAG, "addPostStarted");
         mAddPost.getUiComponentDelegate().populateStarting();
     }
 
@@ -68,7 +73,7 @@ public class PostAddFragment extends android.app.Fragment {
         mAddPost.getUiComponentDelegate().populateFromServer(postAdd);
     }
 
-    public String getContent() {
+    public String getPostContent() {
         return mAddPost.getPostContent();
     }
 

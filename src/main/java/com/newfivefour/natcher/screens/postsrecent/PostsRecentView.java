@@ -1,4 +1,4 @@
-package com.newfivefour.natcher.screens.recentposts;
+package com.newfivefour.natcher.screens.postsrecent;
 
 import android.app.Activity;
 import android.content.Context;
