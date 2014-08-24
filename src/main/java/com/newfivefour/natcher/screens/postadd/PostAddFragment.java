@@ -50,7 +50,6 @@ public class PostAddFragment extends android.app.Fragment {
     public void onResume() {
         Log.d(TAG, "onResume");
         super.onResume();
-        mAddPost.createUiComponent();
         mPresenter.onResume();
     }
 

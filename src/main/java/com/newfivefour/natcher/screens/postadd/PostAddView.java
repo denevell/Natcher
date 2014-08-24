@@ -2,7 +2,6 @@ package com.newfivefour.natcher.screens.postadd;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -25,10 +24,9 @@ public class PostAddView extends FrameLayout implements
 
     public PostAddView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        Log.d(TAG, "PostAddView() started");
         LayoutInflater.from(context).inflate(R.layout.post_add_view, this, true);
         mContentEditText = (EditText) findViewById(R.id.post_add_edittext);
-        Log.d(TAG, "PostAddView() finished");
+        createUiComponent();
     }
 
     @SuppressWarnings("unused")
@@ -54,7 +52,7 @@ public class PostAddView extends FrameLayout implements
     public void clearContent() {
     }
 
-    public void createUiComponent() {
+    private void createUiComponent() {
         mUIComponent = new UiComponentVanilla<>(this);
         LoadingErrorEmptyWidget loadingWidget = new LoadingErrorEmptyWidget(this, R.layout.loading_layout, -1, -1);
         loadingWidget.showLoading(false);
