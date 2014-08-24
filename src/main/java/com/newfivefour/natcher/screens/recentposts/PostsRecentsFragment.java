@@ -13,17 +13,17 @@ import com.newfivefour.natcher.uicomponent.events.OnEmpty;
 import com.newfivefour.natcher.uicomponent.events.OnRefresh;
 import com.newfivefour.natcher.uicomponent.widgets.WindowLoadingSpinnerWidget;
 
-public class NatcherFragment extends android.app.Fragment {
+public class PostsRecentsFragment extends android.app.Fragment {
 
-    private static final String TAG = NatcherFragment.class.getSimpleName();
-    private NatcherPresenter mPresenter;
-    private RecentPostsView mRecentPostsView;
+    private static final String TAG = PostsRecentsFragment.class.getSimpleName();
+    private PostsRecentPresenter mPresenter;
+    private PostsRecentView mPostsRecentView;
     private WindowLoadingSpinnerWidget mWindowLoadingSpinnerDelegate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPresenter = new NatcherPresenter(this);
+        mPresenter = new PostsRecentPresenter(this);
     }
 
     @Override
@@ -35,17 +35,17 @@ public class NatcherFragment extends android.app.Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.natcher_fragment, container, false);
-        mRecentPostsView = (RecentPostsView) v.findViewById(R.id.natcher_listview);
+        View v = inflater.inflate(R.layout.posts_list_fragment, container, false);
+        mPostsRecentView = (PostsRecentView) v.findViewById(R.id.natcher_listview);
 
-        mRecentPostsView.getUiComponentDelegate().setRefreshableConnector(new OnRefresh() {
+        mPostsRecentView.getUiComponentDelegate().setRefreshableConnector(new OnRefresh() {
             @Override
             public void onRefreshContent() {
                 Log.d(TAG, "onRefreshContent()");
                 mPresenter.recentPostsFetch();
             }
         });
-        mRecentPostsView.getUiComponentDelegate().setEmptyConnector(new OnEmpty() {
+        mPostsRecentView.getUiComponentDelegate().setEmptyConnector(new OnEmpty() {
             @Override
             public void onIsEmpty() {
                 Toast.makeText(getActivity(), "Yeah, it's empty.", Toast.LENGTH_LONG).show();
@@ -64,31 +64,31 @@ public class NatcherFragment extends android.app.Fragment {
     public void onPause() {
         super.onPause();
         mPresenter.onPause();
-        mRecentPostsView.getUiComponentDelegate().onResetComponent();
+        mPostsRecentView.getUiComponentDelegate().onResetComponent();
     }
 
     public void setRecentPostsLoadingStart() {
-        mRecentPostsView.getUiComponentDelegate().populateStarting();
+        mPostsRecentView.getUiComponentDelegate().populateStarting();
     }
 
     public void setRecentPosts(PostsRecentService.RecentPosts recentPosts) {
-        mRecentPostsView.getUiComponentDelegate().populateFromServer(recentPosts);
+        mPostsRecentView.getUiComponentDelegate().populateFromServer(recentPosts);
     }
 
     public void setRecentPostsFromCache(PostsRecentService.RecentPosts recentPosts) {
-        mRecentPostsView.getUiComponentDelegate().populateFromCache(recentPosts);
+        mPostsRecentView.getUiComponentDelegate().populateFromCache(recentPosts);
     }
 
     public void setRecentPostsEmptyFromCache() {
-        mRecentPostsView.getUiComponentDelegate().populateWithEmptyContentFromCache();
+        mPostsRecentView.getUiComponentDelegate().populateWithEmptyContentFromCache();
     }
 
     public void setRecentPostsEmptyFromServer() {
-        mRecentPostsView.getUiComponentDelegate().populateWithEmptyContentFromServer();
+        mPostsRecentView.getUiComponentDelegate().populateWithEmptyContentFromServer();
     }
 
     public void setRecentPostsError(String s, int responseCode) {
-        mRecentPostsView.getUiComponentDelegate().populateFromServerError(responseCode);
+        mPostsRecentView.getUiComponentDelegate().populateFromServerError(responseCode);
     }
 
 }

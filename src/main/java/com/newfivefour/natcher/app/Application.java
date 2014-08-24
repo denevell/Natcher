@@ -2,6 +2,7 @@ package com.newfivefour.natcher.app;
 
 import android.content.Context;
 
+import com.newfivefour.natcher.networking.NukeSSLCerts;
 import com.squareup.otto.Bus;
 
 public class Application extends android.app.Application {
@@ -12,6 +13,7 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         this.sContext = this;
+        NukeSSLCerts.nuke();
     }
 
     public static Bus getEventBus() {
@@ -24,4 +26,5 @@ public class Application extends android.app.Application {
     public static Context getContext() {
         return sContext;
     }
+
 }

@@ -5,11 +5,11 @@ import com.newfivefour.natcher.app.Presenter;
 import com.newfivefour.natcher.services.PostsRecentService;
 import com.squareup.otto.Subscribe;
 
-public class NatcherPresenter implements Presenter {
+public class PostsRecentPresenter implements Presenter {
 
-    private final NatcherFragment mView;
+    private final PostsRecentsFragment mView;
 
-    public NatcherPresenter(NatcherFragment natcherActivity) {
+    public PostsRecentPresenter(PostsRecentsFragment natcherActivity) {
         mView = natcherActivity;
     }
 

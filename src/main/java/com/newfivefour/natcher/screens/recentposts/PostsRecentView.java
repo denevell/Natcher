@@ -21,16 +21,16 @@ import com.newfivefour.natcher.uicomponent.widgets.SwipeToRefreshWidget;
 import com.newfivefour.natcher.uicomponent.widgets.TextViewServerErrorWidget;
 import com.newfivefour.natcher.uicomponent.widgets.WindowLoadingSpinnerWidget;
 
-public class RecentPostsView extends FrameLayout implements
+public class PostsRecentView extends FrameLayout implements
         UiComponentDelegate<PostsRecentService.RecentPosts>,
         Populatable<PostsRecentService.RecentPosts> {
 
     private UiComponentVanilla<PostsRecentService.RecentPosts> mUIComponent;
     private ListView mListView;
 
-    public RecentPostsView(Context context, AttributeSet attrs, int defStyle) {
+    public PostsRecentView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        View rootView = LayoutInflater.from(context).inflate(R.layout.natcher_listview, this, true);
+        View rootView = LayoutInflater.from(context).inflate(R.layout.posts_list_view, this, true);
         mListView = (ListView) rootView.findViewById(R.id.listView);
 
         // Setup the swipe view
@@ -50,7 +50,7 @@ public class RecentPostsView extends FrameLayout implements
     }
 
     @SuppressWarnings("unused")
-    public RecentPostsView(Context context, AttributeSet attrs) {
+    public PostsRecentView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
@@ -63,7 +63,7 @@ public class RecentPostsView extends FrameLayout implements
     public void populateWithContent(PostsRecentService.RecentPosts ob) {
         ArrayAdapter<PostsRecentService.RecentPosts.Post> adapter = new ArrayAdapter<>(
                 getContext(),
-                R.layout.post_list_item,
+                R.layout.posts_list_item,
                 ob.getPosts());
         Parcelable listInstance = mListView.onSaveInstanceState();
         mListView.setAdapter(adapter);

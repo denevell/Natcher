@@ -3,16 +3,17 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/holo_orange_light"
     >
 
     <EditText
+        android:id="@+id/post_add_edittext"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:inputType="textMultiLine|textCapSentences"
+        android:imeOptions="actionDone"
         android:ems="10"
-        android:id="@+id/editText"
         android:layout_gravity="left|top"
         android:hint="Start typing post"
         android:gravity="start|top" />
 </FrameLayout>
-    <!-- android:background="@android:color/holo_orange_light" -->

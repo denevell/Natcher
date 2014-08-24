@@ -281,6 +281,7 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
 
     private OkClient createHttpClient() {
         OkHttpClient http_client = new OkHttpClient();
+        http_client.setSslSocketFactory(NukeSSLCerts.sc.getSocketFactory());
         try {
             Cache responseCache = new Cache(Application.getContext().getCacheDir(), SIZE_OF_RESPONSE_CACHE);
             http_client.setCache(responseCache);

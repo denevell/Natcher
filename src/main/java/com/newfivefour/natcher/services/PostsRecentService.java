@@ -18,7 +18,7 @@ public class PostsRecentService {
 
     @SuppressWarnings("unchecked")
     public void fetch(Bundle f) {
-        String baseUrl = "https://android-manchester.co.uk/api/rest";
+        String baseUrl = ServiceUrls.base;
 
         new NetworkingMessageBusService.Builder<RecentPosts, RecentPostsServiceInterface>()
                 .dontRerequestExistingRequest(f)
