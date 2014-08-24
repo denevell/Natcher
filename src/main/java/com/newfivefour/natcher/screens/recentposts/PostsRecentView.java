@@ -74,7 +74,7 @@ public class PostsRecentView extends FrameLayout implements
     }
 
     @Override
-    public boolean isContentEmpty() {
+    public boolean shouldShowInComponentLoading() {
         return mListView.getAdapter() == null || mListView.getAdapter().getCount() == 0;
     }
 

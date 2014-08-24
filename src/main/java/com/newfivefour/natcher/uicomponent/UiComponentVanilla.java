@@ -233,7 +233,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         mShouldStartPageLoaderAfterCachedResult = true;
         setEmptyError(false);
         hideServerErrors();
-        if(mPopulatable.isContentEmpty()) {
+        if(mPopulatable.shouldShowInComponentLoading()) {
             Log.d(TAG, "populateStarting(): set in-component loading");
             setLoading(true);
         } else {
@@ -270,7 +270,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     public void populateFromServerError(int responseCode) {
         Log.d(TAG, "populateFromServerError()");
         mShouldStartPageLoaderAfterCachedResult = false;
-        if(mPopulatable.isContentEmpty()) {
+        if(mPopulatable.shouldShowInComponentLoading()) {
             Log.d(TAG, "populateFromServerError(): empty view content");
             setServerError(true);
         } else {

@@ -16,7 +16,9 @@ import com.newfivefour.natcher.uicomponent.views.ServerErrorView;
 
 /**
  * Can be used a LoadingView, ServerErrorView and EmptyView as a quick
- * one-stop shop when setting up a UiComponen.
+ * one-stop shop when setting up a UiComponent.
+ *
+ * Adds a error, empty and loading layout to end of the passed ViewGroup.
  */
 public class LoadingErrorEmptyWidget implements
         OnRefreshConnector,
@@ -39,6 +41,8 @@ public class LoadingErrorEmptyWidget implements
     }
 
     /**
+     * Adds a error, empty and loading layout to end of the passed ViewGroup.
+     *
      * @param errorLayout Should be something that implements OnRefreshConnector to receive a callback about refreshes
      * @param emptyLayout Should be something that implements On{Refresh,Empty}Connector to receive such callback
      */
@@ -67,7 +71,7 @@ public class LoadingErrorEmptyWidget implements
             setLayoutParams(mLoading, params);
             setLayoutParams(mError, params);
             setLayoutParams(mEmpty, params);
-        } else if (view instanceof ViewGroup) {
+        } else {
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             setLayoutParams(mLoading, params);
             setLayoutParams(mError, params);
@@ -75,13 +79,13 @@ public class LoadingErrorEmptyWidget implements
         }
         // Add views
         if(mLoading!=null) {
-            view.addView(mLoading);
+            view.addView(mLoading, view.getChildCount());
         }
         if(mEmpty!=null) {
-            view.addView(mEmpty);
+            view.addView(mEmpty, view.getChildCount());
         }
         if(mError!=null) {
-            view.addView(mError);
+            view.addView(mError, view.getChildCount());
         }
         setVisibleOrInvisible(mLoading, true);
         setVisibleOrInvisible(mError, true);
@@ -133,7 +137,7 @@ public class LoadingErrorEmptyWidget implements
 
     private void setLayoutParams(View v, ViewGroup.LayoutParams params) {
         if(v==null || params==null) return;
-        mEmpty.setLayoutParams(params);
+        v.setLayoutParams(params);
     }
 
 }

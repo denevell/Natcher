@@ -2,6 +2,7 @@ package com.newfivefour.natcher.screens.enterpost;
 
 import com.newfivefour.natcher.app.Application;
 import com.newfivefour.natcher.app.Presenter;
+import com.newfivefour.natcher.models.PostAdded;
 import com.newfivefour.natcher.services.PostAddService;
 import com.squareup.otto.Subscribe;
 
@@ -29,13 +30,16 @@ public class PostAddPresenter implements Presenter {
                         mView.getArguments(),
                         null,
                         mView.getContent());
+        mView.addPostStarted();
     }
 
     @Subscribe
-    public void recentPosts(PostAddService.PostAdd addeded) {
+    public void addPost(PostAdded added) {
+        mView.addPostSuccess(added);
     }
 
     @Subscribe
     public void addPostError(PostAddService.PostAddError error) {
+        mView.addPostError(error.responseCode);
     }
 }

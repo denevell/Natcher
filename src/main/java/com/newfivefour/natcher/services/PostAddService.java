@@ -2,7 +2,6 @@ package com.newfivefour.natcher.services;
 
 import android.os.Bundle;
 
-import com.newfivefour.natcher.models.PostAdded;
 import com.newfivefour.natcher.networking.NetworkingMessageBusService;
 import com.newfivefour.natcher.networking.ResponseError;
 
@@ -16,7 +15,7 @@ import retrofit.http.PUT;
 public class PostAddService {
 
     private static final String TAG = PostAddService.class.getSimpleName();
-    private NetworkingMessageBusService<PostAdded, PostAddInterface> mService;
+    private NetworkingMessageBusService<com.newfivefour.natcher.models.PostAdded, PostAddInterface> mService;
 
     @SuppressWarnings("unchecked")
     public void fetch(Bundle f, final String authKey, final String content) {
@@ -27,9 +26,9 @@ public class PostAddService {
                 .dontRerequestExistingRequest(f)
                 .fetch(baseUrl,
                         PostAddInterface.class,
-                        new NetworkingMessageBusService.GetResult<PostAdded, PostAddInterface>() {
+                        new NetworkingMessageBusService.GetResult<com.newfivefour.natcher.models.PostAdded, PostAddInterface>() {
                             @Override
-                            public PostAdded getResult(PostAddInterface service) throws Exception {
+                            public com.newfivefour.natcher.models.PostAdded getResult(PostAddInterface service) throws Exception {
                                 return service.go("bdc2c587-2d88-4b79-a5ad-e0047b219337", postAdd);
                             }
                         },
@@ -39,12 +38,12 @@ public class PostAddService {
     }
 
     public PostAddService() {
-        mService = new NetworkingMessageBusService<PostAdded, PostAddInterface>();
+        mService = new NetworkingMessageBusService<com.newfivefour.natcher.models.PostAdded, PostAddInterface>();
     }
 
     public static interface PostAddInterface {
         @PUT("/post/addthread")
-        PostAdded go(@Header("AuthKey") String authKey, @Body PostAdd post);
+        com.newfivefour.natcher.models.PostAdded go(@Header("AuthKey") String authKey, @Body PostAdd post);
     }
 
     public static class PostAddError extends ResponseError {}

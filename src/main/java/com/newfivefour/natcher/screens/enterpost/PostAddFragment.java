@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.newfivefour.natcher.R;
+import com.newfivefour.natcher.models.PostAdded;
 
 
 public class PostAddFragment extends android.app.Fragment {
@@ -43,8 +44,33 @@ public class PostAddFragment extends android.app.Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.onPause();
+    }
+
+    public void addPostStarted() {
+        mAddPost.getUiComponentDelegate().populateStarting();
+    }
+
+    public void addPostError(int errorCode) {
+        mAddPost.getUiComponentDelegate().populateFromServerError(errorCode);
+    }
+
+    public void addPostSuccess(PostAdded postAdd) {
+        mAddPost.getUiComponentDelegate().populateFromServer(postAdd);
+    }
+
     public String getContent() {
         return mAddPost.getPostContent();
     }
+
 
 }
