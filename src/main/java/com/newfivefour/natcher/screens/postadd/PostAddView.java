@@ -21,12 +21,14 @@ public class PostAddView extends FrameLayout implements
 
     private static final String TAG = PostAddView.class.getSimpleName();
     private final EditText mContentEditText;
+    private final EditText mSubjectEditText;
     private UiComponentVanilla<PostAdded> mUIComponent;
 
     public PostAddView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         LayoutInflater.from(context).inflate(R.layout.post_add_view, this, true);
-        mContentEditText = (EditText) findViewById(R.id.post_add_edittext);
+        mContentEditText = (EditText) findViewById(R.id.post_add_content_edittext);
+        mSubjectEditText = (EditText) findViewById(R.id.post_add_subject_edittext);
         createUiComponent();
     }
 
@@ -43,6 +45,7 @@ public class PostAddView extends FrameLayout implements
     @Override
     public void populateOnSuccessfulResponse(PostAdded ob) {
         mContentEditText.setText("");
+        mSubjectEditText.setText("");
     }
 
     @Override
@@ -67,5 +70,9 @@ public class PostAddView extends FrameLayout implements
 
     public String getPostContent() {
         return mContentEditText.getText().toString();
+    }
+
+    public String getPostSubject() {
+        return mSubjectEditText.getText().toString();
     }
 }

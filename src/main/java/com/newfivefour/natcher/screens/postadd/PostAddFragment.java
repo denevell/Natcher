@@ -90,5 +90,8 @@ public class PostAddFragment extends Fragment {
         return mAddPost.getPostContent();
     }
 
+    public String getPostSubject() {
+        return mAddPost.getPostSubject();
+    }
 
 }

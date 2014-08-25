@@ -28,10 +28,10 @@ public class PostAddService implements NetworkingServiceDelegate {
     }
 
     @SuppressWarnings("unchecked")
-    public void fetch(final String authKey, final String content) {
+    public void fetch(final String authKey, final String subject, final String content) {
         String baseUrl = ServiceUrls.base;
 
-        final PostAdd postAdd = new PostAdd("-", content, null, null);
+        final PostAdd postAdd = new PostAdd(subject, content, null, null);
         mService.fetch(baseUrl,
                 PostAddInterface.class,
                 new NetworkingMessageBusService.GetResult<com.newfivefour.natcher.models.PostAdded, PostAddInterface>() {

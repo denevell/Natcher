@@ -40,6 +40,7 @@ public class PostAddPresenter implements Presenter {
     public void sendPost() {
         mPostAddService.fetch(
                 null,
+                mView.getPostSubject(),
                 mView.getPostContent());
         mView.addPostStarted();
     }

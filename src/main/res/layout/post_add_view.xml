@@ -1,19 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/holo_orange_light"
     >
 
     <EditText
-        android:id="@+id/post_add_edittext"
+        android:id="@+id/post_add_subject_edittext"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:inputType="textMultiLine|textCapSentences"
         android:imeOptions="actionDone"
         android:ems="10"
-        android:layout_gravity="left|top"
-        android:hint="Start typing post"
+        android:layout_gravity="start|top"
+        tools:text="Hiya"
+        android:hint="Its title"
+        android:textColor="#505050"
+        android:textSize="26sp"
         android:gravity="start|top" />
-</FrameLayout>
+
+    <EditText
+        android:id="@+id/post_add_content_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/post_add_subject_edittext"
+        android:inputType="textMultiLine|textCapSentences"
+        android:imeOptions="actionDone"
+        android:ems="10"
+        android:layout_gravity="start|top"
+        tools:text="Hiya"
+        android:hint="Its message"
+        android:textColor="#505050"
+        android:textSize="26sp"
+        android:gravity="start|top"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>
