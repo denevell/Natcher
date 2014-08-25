@@ -11,6 +11,7 @@ import com.newfivefour.natcher.models.PostAdded;
 import com.newfivefour.natcher.uicomponent.Populatable;
 import com.newfivefour.natcher.uicomponent.UiComponentDelegate;
 import com.newfivefour.natcher.uicomponent.UiComponentVanilla;
+import com.newfivefour.natcher.uicomponent.widgets.HideKeyboardWidget;
 import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
 import com.newfivefour.natcher.uicomponent.widgets.TextViewServerErrorWidget;
 
@@ -61,6 +62,7 @@ public class PostAddView extends FrameLayout implements
         TextViewServerErrorWidget textViewServerErrorWidget = new TextViewServerErrorWidget(getContext().getApplicationContext());
         mUIComponent.setInComponentServerErrorDisplay(textViewServerErrorWidget);
         mUIComponent.setInComponentServerErrorDisplayForUseWhenWeHaveContent(textViewServerErrorWidget);
+        mUIComponent.setHideKeyboard(new HideKeyboardWidget(this));
     }
 
     public String getPostContent() {

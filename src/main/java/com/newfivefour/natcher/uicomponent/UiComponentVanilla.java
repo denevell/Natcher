@@ -122,6 +122,12 @@ import com.newfivefour.natcher.uicomponent.views.ServerErrorView;
  * Given we set a is empty callback
  * Then the widget that deals with errors and empty views is given that
  *
+ * Keyboard hider
+ * #################
+ *
+ * Given we start populating
+ * Then we should hide the keyboard if callback there
+ *
  */
 public class UiComponentVanilla<T> implements UiComponent<T> {
     private static String TAG = UiComponentVanilla.class.getSimpleName();
@@ -132,6 +138,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     private EmptyView mEmptyView;
     private ServerErrorView mServerErrorView;
     private ServerErrorView mServerErrorViewWhenWeHaveContent;
+    private Runnable mHideKeyboardCallback;
 
     /**
      * Used to communicate with whatever is using this as a delegate
@@ -198,6 +205,12 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     }
 
     @Override
+    public void setHideKeyboard(Runnable runnable) {
+        Log.d(TAG, "setHideKeyboard()");
+        mHideKeyboardCallback = runnable;
+    }
+
+    @Override
     public void setRefreshableConnector(OnRefresh connector) {
         Log.d(TAG, "setRefreshableConnector()");
         if(mEmptyView !=null) {
@@ -233,6 +246,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         mShouldStartPageLoaderAfterCachedResult = true;
         setEmptyError(false);
         hideServerErrors();
+        hideKeyboard();
         if(mPopulatable.shouldShowInComponentLoading()) {
             Log.d(TAG, "populateStarting(): set in-component loading");
             setLoading(true);
@@ -343,5 +357,12 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
             mPageWideLoader.showLoading(show);
         }
     }
+
+    private void hideKeyboard() {
+        if(mHideKeyboardCallback!=null) {
+            mHideKeyboardCallback.run();
+        }
+    }
+
 
 }

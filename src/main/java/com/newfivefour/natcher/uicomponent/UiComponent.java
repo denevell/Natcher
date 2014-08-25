@@ -15,6 +15,8 @@ public interface UiComponent<T> extends
         OnRefreshConnector,
         OnEmptyConnector {
 
+    void setHideKeyboard(Runnable runnable);
+
     /**
      * Called when the component is destroyed.
      *
