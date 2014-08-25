@@ -1,6 +1,8 @@
 package com.newfivefour.natcher.screens.postadd;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -9,15 +11,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.newfivefour.natcher.MainPagePageSwitcher;
 import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.models.PostAdded;
 
 
-public class PostAddFragment extends android.app.Fragment {
+public class PostAddFragment extends Fragment {
 
     private static final String TAG = PostAddFragment.class.getSimpleName();
     private PostAddPresenter mPresenter;
     private PostAddView mAddPost;
+    private MainPagePageSwitcher mMainPageSwitcher;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if(!(activity instanceof MainPagePageSwitcher)) {
+            throw new RuntimeException("Parent needs to implement correct interface");
+        }
+        mMainPageSwitcher = (MainPagePageSwitcher) activity;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +83,7 @@ public class PostAddFragment extends android.app.Fragment {
 
     public void addPostSuccess(PostAdded postAdd) {
         mAddPost.getUiComponentDelegate().populateFromServer(postAdd);
+        mMainPageSwitcher.gotoRecentPosts();
     }
 
     public String getPostContent() {

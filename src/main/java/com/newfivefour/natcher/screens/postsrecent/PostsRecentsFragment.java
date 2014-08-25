@@ -1,6 +1,7 @@
 package com.newfivefour.natcher.screens.postsrecent;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +14,7 @@ import com.newfivefour.natcher.uicomponent.events.OnEmpty;
 import com.newfivefour.natcher.uicomponent.events.OnRefresh;
 import com.newfivefour.natcher.uicomponent.widgets.WindowLoadingSpinnerWidget;
 
-public class PostsRecentsFragment extends android.app.Fragment {
+public class PostsRecentsFragment extends Fragment {
 
     private static final String TAG = PostsRecentsFragment.class.getSimpleName();
     private PostsRecentPresenter mPresenter;

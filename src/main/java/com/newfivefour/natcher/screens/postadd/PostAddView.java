@@ -40,7 +40,8 @@ public class PostAddView extends FrameLayout implements
     }
 
     @Override
-    public void populateWithContent(PostAdded ob) {
+    public void populateOnSuccessfulResponse(PostAdded ob) {
+        mContentEditText.setText("");
     }
 
     @Override
@@ -49,7 +50,7 @@ public class PostAddView extends FrameLayout implements
     }
 
     @Override
-    public void clearContent() {
+    public void clearContentWhenServerReturnsEmptyResponse() {
     }
 
     private void createUiComponent() {

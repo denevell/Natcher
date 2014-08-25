@@ -35,7 +35,7 @@ public class PostsRecentView extends FrameLayout implements
 
         // Setup the swipe view
         Activity activity = ((Activity)getContext());
-        SwipeToRefreshWidget swipe = new SwipeToRefreshWidget((SwipeRefreshLayout) activity.findViewById(R.id.swipe));
+        SwipeToRefreshWidget swipe = new SwipeToRefreshWidget((SwipeRefreshLayout) findViewById(R.id.swipe));
 
         // Setup ui component
         LoadingErrorEmptyWidget loadingErrorEmptyWidget = new LoadingErrorEmptyWidget(this, -1, R.layout.error_container, R.layout.empty_container);
@@ -60,7 +60,7 @@ public class PostsRecentView extends FrameLayout implements
     }
 
     @Override
-    public void populateWithContent(PostsRecentService.RecentPosts ob) {
+    public void populateOnSuccessfulResponse(PostsRecentService.RecentPosts ob) {
         ArrayAdapter<PostsRecentService.RecentPosts.Post> adapter = new ArrayAdapter<>(
                 getContext(),
                 R.layout.posts_list_item,
@@ -79,7 +79,7 @@ public class PostsRecentView extends FrameLayout implements
     }
 
     @Override
-    public void clearContent() {
+    public void clearContentWhenServerReturnsEmptyResponse() {
         mListView.setAdapter(null);
     }
 

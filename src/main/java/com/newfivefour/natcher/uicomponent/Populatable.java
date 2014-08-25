@@ -7,7 +7,7 @@ package com.newfivefour.natcher.uicomponent;
  * 3. How to clear that view on empty content from server
  */
 public interface Populatable<T> {
-    void populateWithContent(T ob);
+    void populateOnSuccessfulResponse(T ob);
     /**
      * Used to ascertain if should show the overall page loader (if not empty) or the in page loader (if empty).
      */
@@ -15,5 +15,5 @@ public interface Populatable<T> {
     /**
      * Used when we have 'empty' content from the server, and we want to clear the existing cached view
      */
-    void clearContent();
+    void clearContentWhenServerReturnsEmptyResponse();
 }

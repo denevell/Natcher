@@ -245,7 +245,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateFromCache(T ob) {
         Log.d(TAG, "populateFromCache()");
-        mPopulatable.populateWithContent(ob);
+        mPopulatable.populateOnSuccessfulResponse(ob);
         setLoading(false);
         hideServerErrors();
         setEmptyError(false);
@@ -259,7 +259,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     public void populateFromServer(T ob) {
         Log.d(TAG, "populateFromServer()");
         mShouldStartPageLoaderAfterCachedResult = false;
-        mPopulatable.populateWithContent(ob);
+        mPopulatable.populateOnSuccessfulResponse(ob);
         setPageWideLoading(false);
         setLoading(false);
         hideServerErrors();
@@ -286,7 +286,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateWithEmptyContentFromServer() {
         Log.d(TAG, "populateWithEmptyContentFromServer()");
-        mPopulatable.clearContent();
+        mPopulatable.clearContentWhenServerReturnsEmptyResponse();
         setPageWideLoading(false);
         setLoading(false);
         hideServerErrors();
@@ -296,7 +296,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateWithEmptyContentFromCache() {
         Log.d(TAG, "populateWithEmptyContentFromCache()");
-        mPopulatable.clearContent();
+        mPopulatable.clearContentWhenServerReturnsEmptyResponse();
         setLoading(false);
         hideServerErrors();
         setEmptyError(true);
