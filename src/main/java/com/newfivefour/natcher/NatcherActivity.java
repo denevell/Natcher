@@ -55,7 +55,7 @@ public class NatcherActivity extends ActionBarActivity implements MainPagePageSw
         vp.setPageTransformer(true, new ViewPager.PageTransformer() {
             @Override
             public void transformPage(View view, float v) {
-                view.setRotationY(v * 90);
+                view.setRotationY(v * 180);
             }
         });
     }

@@ -7,7 +7,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
@@ -53,11 +52,8 @@ public class PostsRecentView extends FrameLayout implements
 
     @Override
     public void populateOnSuccessfulResponse(PostsRecentService.RecentPosts ob) {
-        ArrayAdapter<PostsRecentService.RecentPosts.Post> adapter = new ArrayAdapter<>(
-                getContext(),
-                R.layout.posts_list_item,
-                ob.getPosts());
         Parcelable listInstance = mListView.onSaveInstanceState();
+        PostsRecentArrayAdapter adapter = new PostsRecentArrayAdapter(getContext(), R.layout.posts_list_item, ob.getPosts());
         mListView.setAdapter(adapter);
         if(listInstance!=null) {
             mListView.onRestoreInstanceState(listInstance);

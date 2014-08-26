@@ -65,6 +65,7 @@ public class PostsRecentService {
 
         public static class Post {
             private String content;
+            private String subject;
 
             @Override
             public String toString() {
@@ -77,6 +78,14 @@ public class PostsRecentService {
 
             public void setContent(String content) {
                 this.content = content;
+            }
+
+            public String getSubject() {
+                return subject;
+            }
+
+            public void setSubject(String subject) {
+                this.subject = subject;
             }
         }
     }

@@ -5,4 +5,14 @@
         <item name="progressBarPadding">0dip</item>
     </style>
 
+    <style name="subject_text" parent="android:TextAppearance.Holo.Large">
+        <item name="android:textSize">@dimen/subject_text_size</item>
+        <item name="android:textColor">@color/subject_text</item>
+    </style>
+
+    <style name="content_text" parent="android:TextAppearance.Holo.Small">
+        <item name="android:textSize">@dimen/content_text_size</item>
+        <item name="android:textColor">@color/content_text</item>
+    </style>
+
 </resources>
