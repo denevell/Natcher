@@ -2,20 +2,20 @@ package com.newfivefour.natcher.uicomponent;
 
 import com.newfivefour.natcher.uicomponent.events.OnEmptyConnector;
 import com.newfivefour.natcher.uicomponent.events.OnRefreshConnector;
-import com.newfivefour.natcher.uicomponent.views.LoadingView;
 
 /**
  * Allows your component to enjoy all the goodness of a UiComponent
  * i.e. dealing with loading views, error views, empty views, cached content,
  * overall loading view, refreshing from server error, actions on empty content,
  *
+ * We're extending OnRefreshConnector and OnEmptyConnector because the Fragment,
+ * which will not have direct access to the implementation of UiComponent, may need
+ * to do something regarding logic on refreshing the component, like calling a
+ * service method, or finding it empty, like activating another ui element.
+ *
  * @see com.newfivefour.natcher.uicomponent.UiComponentVanilla
  */
-public interface UiComponent<T> extends
-        OnRefreshConnector,
-        OnEmptyConnector {
-
-    void setHideKeyboard(Runnable runnable);
+public interface UiComponent<T> extends OnRefreshConnector, OnEmptyConnector {
 
     /**
      * Called when the component is destroyed.
@@ -27,14 +27,6 @@ public interface UiComponent<T> extends
      * chance to dis-activate as yet, since the network hasn't returned.
      */
     void onResetComponent();
-
-    /**
-     * The component may want to set a loader for the overall page, in addition to
-     * the loader is this component.
-     *
-     * If it's set, it only shows when there's cached content, and we're refreshing.
-     */
-    UiComponent<T> setPageWideLoadingDisplay(LoadingView loadingView);
 
     void populateStarting();
     void populateFromCache(T ob);

@@ -178,6 +178,24 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         return this;
     }
 
+    /**
+     * 1. So, we have this view. A normal custom view.
+     *
+     * 2. It has a delegate interface.
+     *
+     * This means that, like many other views, other will be able to access an object
+     * it has: the object allows the caller to manipulate the view.
+     *
+     * 3. There are two particular methods on this component that allow the caller to
+     * specify something happens on an event.
+     *
+     *  3.1. One of these methods allows the caller to say something should happen when
+     *  the component presses refresh.
+     *
+     *  3.2 Another one of these methods allows the caller to say something should the
+     * component have an empty view.
+     */
+
     public UiComponentVanilla<T> setInComponentServerErrorDisplay(ServerErrorView errorComponent) {
         mServerErrorView = errorComponent;
         return this;
@@ -185,6 +203,12 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
 
     public UiComponentVanilla<T> setInComponentServerErrorDisplayForUseWhenWeHaveContent(ServerErrorView errorComponent) {
         mServerErrorViewWhenWeHaveContent = errorComponent;
+        return this;
+    }
+
+    public UiComponentVanilla<T> setPageWideLoadingDisplay(LoadingView loadingView) {
+        Log.d(TAG, "setPageWideLoadingDisplay()");
+        mPageWideLoader = loadingView;
         return this;
     }
 
@@ -196,18 +220,17 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         return this;
     }
 
+    public void setHideKeyboard(Runnable runnable) {
+        Log.d(TAG, "setHideKeyboard()");
+        mHideKeyboardCallback = runnable;
+    }
+
     @Override
     public void setEmptyConnector(OnEmpty connector) {
         Log.d(TAG, "setEmptyConnector()");
         if(mEmptyView !=null) {
             mEmptyView.setEmptyConnector(connector);
         }
-    }
-
-    @Override
-    public void setHideKeyboard(Runnable runnable) {
-        Log.d(TAG, "setHideKeyboard()");
-        mHideKeyboardCallback = runnable;
     }
 
     @Override
@@ -224,13 +247,10 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         }
     }
 
-    @Override
-    public UiComponentVanilla<T> setPageWideLoadingDisplay(LoadingView loadingView) {
-        Log.d(TAG, "setPageWideLoadingDisplay()");
-        mPageWideLoader = loadingView;
-        return this;
-    }
-
+    /**
+     * Hide:
+     * 1. All loaders
+     */
     @Override
     public void onResetComponent() {
         // This will only do so if it's active
@@ -240,6 +260,15 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setLoading(false);
     }
 
+    /**
+     * Show:
+     * 1. In or out of component loading depending on callback
+     *
+     * Hide:
+     * 1. Empty displays
+     * 2. Server error displays
+     * 3. Keyboard
+     */
     @Override
     public void populateStarting() {
         Log.d(TAG, "populateStarting()");
@@ -247,7 +276,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setEmptyError(false);
         hideServerErrors();
         hideKeyboard();
-        if(mPopulatable.shouldShowInComponentLoading()) {
+        if(mPopulatable.shouldShowInComponentLoadingInsteadOfOutOfComponent()) {
             Log.d(TAG, "populateStarting(): set in-component loading");
             setLoading(true);
         } else {
@@ -256,6 +285,18 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         }
     }
 
+    /**
+     * Give the content to the view to populate
+     *
+     * Show:
+     * 1. Out-of-component loading (if we're before the server return and a callback says it's okay)
+     *
+     * Hide:
+     * 1. In-component loading
+     * 2. Server error displays
+     * 3. Empty displays
+     *
+     */
     @Override
     public void populateFromCache(T ob) {
         Log.d(TAG, "populateFromCache()");
@@ -263,12 +304,20 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setLoading(false);
         hideServerErrors();
         setEmptyError(false);
-        if(mShouldStartPageLoaderAfterCachedResult) {
+        if(mShouldStartPageLoaderAfterCachedResult && !mPopulatable.shouldShowInComponentLoadingInsteadOfOutOfComponent()) {
             Log.d(TAG, "populateFromCache(): setPageWideLoading");
             setPageWideLoading(true);
         }
     }
 
+    /**
+     * Give the content to the view to populate
+     *
+     * Hide:
+     * 1. All loading
+     * 2. Server displays
+     * 3. Empty displays
+     */
     @Override
     public void populateFromServer(T ob) {
         Log.d(TAG, "populateFromServer()");
@@ -280,11 +329,21 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setEmptyError(false);
     }
 
+    /**
+     * Show the server error
+     *
+     * Show:
+     * 1. Show the server error, in component or out of component, depending on callback
+     *
+     * Hide:
+     * 1. All loading
+     * 3. Empty displays
+     */
     @Override
     public void populateFromServerError(int responseCode) {
         Log.d(TAG, "populateFromServerError()");
         mShouldStartPageLoaderAfterCachedResult = false;
-        if(mPopulatable.shouldShowInComponentLoading()) {
+        if(mPopulatable.shouldShowServerErrorInComponentOrOutOfComponent()) {
             Log.d(TAG, "populateFromServerError(): empty view content");
             setServerError(true);
         } else {
@@ -297,20 +356,43 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setEmptyError(false);
     }
 
+    /**
+     * Clear the content when we get a empty cache response
+     *
+     * Show:
+     * 1. Empty view
+     *
+     * Hide:
+     * 1. In=component loading
+     * 2. Server errors
+     *
+     * Leave:
+     * 1. Out of component loading
+     */
     @Override
-    public void populateWithEmptyContentFromServer() {
-        Log.d(TAG, "populateWithEmptyContentFromServer()");
+    public void populateWithEmptyContentFromCache() {
+        Log.d(TAG, "populateWithEmptyContentFromCache()");
         mPopulatable.clearContentWhenServerReturnsEmptyResponse();
-        setPageWideLoading(false);
         setLoading(false);
         hideServerErrors();
         setEmptyError(true);
     }
 
+    /**
+     * Show empty view when response from server
+     *
+     * Show:
+     * 1. Empty view
+     *
+     * Hide:
+     * 1. All loading
+     * 2. Server errors
+     */
     @Override
-    public void populateWithEmptyContentFromCache() {
-        Log.d(TAG, "populateWithEmptyContentFromCache()");
+    public void populateWithEmptyContentFromServer() {
+        Log.d(TAG, "populateWithEmptyContentFromServer()");
         mPopulatable.clearContentWhenServerReturnsEmptyResponse();
+        setPageWideLoading(false);
         setLoading(false);
         hideServerErrors();
         setEmptyError(true);

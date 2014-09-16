@@ -49,8 +49,18 @@ public class PostAddView extends FrameLayout implements
     }
 
     @Override
-    public boolean shouldShowInComponentLoading() {
+    public boolean shouldShowInComponentLoadingInsteadOfOutOfComponent() {
         return true;
+    }
+
+    @Override
+    public boolean shouldShowOutOfComponentLoadingAfterCachedContent() {
+        return false;
+    }
+
+    @Override
+    public boolean shouldShowServerErrorInComponentOrOutOfComponent() {
+        return false;
     }
 
     @Override

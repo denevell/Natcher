@@ -61,9 +61,20 @@ public class PostsRecentView extends FrameLayout implements
         adapter.notifyDataSetChanged();
     }
 
+
     @Override
-    public boolean shouldShowInComponentLoading() {
+    public boolean shouldShowInComponentLoadingInsteadOfOutOfComponent() {
         return mListView.getAdapter() == null || mListView.getAdapter().getCount() == 0;
+    }
+
+    @Override
+    public boolean shouldShowOutOfComponentLoadingAfterCachedContent() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldShowServerErrorInComponentOrOutOfComponent() {
+        return true;
     }
 
     @Override

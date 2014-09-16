@@ -9,9 +9,17 @@ package com.newfivefour.natcher.uicomponent;
 public interface Populatable<T> {
     void populateOnSuccessfulResponse(T ob);
     /**
+     * Used to ascertain if should show the error view in the component or outside it
+     */
+    boolean shouldShowServerErrorInComponentOrOutOfComponent();
+    /**
      * Used to ascertain if should show the overall page loader (if not empty) or the in page loader (if empty).
      */
-    boolean shouldShowInComponentLoading();
+    boolean shouldShowInComponentLoadingInsteadOfOutOfComponent();
+    /**
+     * Used to ascertain if should show the overall page loader (if not empty) or the in page loader (if empty).
+     */
+    boolean shouldShowOutOfComponentLoadingAfterCachedContent();
     /**
      * Used when we have 'empty' content from the server, and we want to clear the existing cached view
      */
