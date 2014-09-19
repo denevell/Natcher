@@ -1,6 +1,5 @@
 package com.newfivefour.natcher.screens.postsrecent;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -32,7 +31,6 @@ public class PostsRecentView extends FrameLayout implements
         mListView = (ListView) rootView.findViewById(R.id.listView);
 
         // Setup the swipe view
-        Activity activity = ((Activity)getContext());
         SwipeToRefreshWidget swipe = new SwipeToRefreshWidget((SwipeRefreshLayout) findViewById(R.id.swipe));
 
         // Setup ui component
@@ -90,10 +88,10 @@ public class PostsRecentView extends FrameLayout implements
         mUIComponent = new UiComponentVanilla<>(this);
         mUIComponent
                 .setInComponentLoadingDisplay(swipe)
+                .setOutOfComponentLoadingDisplay(swipe)
                 .setInComponentEmptyDisplay(loadingErrorEmptyWidget)
                 .setInComponentServerErrorDisplay(loadingErrorEmptyWidget)
-                .setInComponentServerErrorDisplayForUseWhenWeHaveContent(new TextViewServerErrorWidget(getContext().getApplicationContext()))
-                .setPageWideLoadingDisplay(swipe)
+                .setOutOfComponentServerErrorDisplay(new TextViewServerErrorWidget(getContext().getApplicationContext()))
                 .setRefreshWidget(swipe);
     }
 

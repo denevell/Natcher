@@ -201,13 +201,13 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         return this;
     }
 
-    public UiComponentVanilla<T> setInComponentServerErrorDisplayForUseWhenWeHaveContent(ServerErrorView errorComponent) {
+    public UiComponentVanilla<T> setOutOfComponentServerErrorDisplay(ServerErrorView errorComponent) {
         mServerErrorViewWhenWeHaveContent = errorComponent;
         return this;
     }
 
-    public UiComponentVanilla<T> setPageWideLoadingDisplay(LoadingView loadingView) {
-        Log.d(TAG, "setPageWideLoadingDisplay()");
+    public UiComponentVanilla<T> setOutOfComponentLoadingDisplay(LoadingView loadingView) {
+        Log.d(TAG, "setOutOfComponentLoadingDisplay()");
         mPageWideLoader = loadingView;
         return this;
     }

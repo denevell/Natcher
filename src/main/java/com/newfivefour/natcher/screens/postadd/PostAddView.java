@@ -85,7 +85,7 @@ public class PostAddView extends FrameLayout implements
         });
         TextViewServerErrorWidget textViewServerErrorWidget = new TextViewServerErrorWidget(getContext().getApplicationContext());
         mUIComponent.setInComponentServerErrorDisplay(textViewServerErrorWidget);
-        mUIComponent.setInComponentServerErrorDisplayForUseWhenWeHaveContent(textViewServerErrorWidget);
+        mUIComponent.setOutOfComponentServerErrorDisplay(textViewServerErrorWidget);
         mUIComponent.setHideKeyboard(new HideKeyboardWidget(this));
     }
 
