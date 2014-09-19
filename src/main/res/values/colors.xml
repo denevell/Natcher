@@ -2,9 +2,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <color name="dark_text">#505050</color>
     <color name="light_text">#d0d0d0</color>
-    <color name="light_darker_text">#b0b0b0</color>
     <color name="subject_text">#d0d0d0</color>
     <color name="content_text">#b0b0b0</color>
 

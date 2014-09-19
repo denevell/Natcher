@@ -1,0 +1,3 @@
+<lint>
+  <issue id="InvalidPackage" severity="ignore" />
+</lint>

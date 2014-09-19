@@ -276,10 +276,10 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setEmptyError(false);
         hideServerErrors();
         hideKeyboard();
-        if(mPopulatable.shouldShowInComponentLoadingInsteadOfOutOfComponent()) {
+        if(mPopulatable.showInComponentLoading()) {
             Log.d(TAG, "populateStarting(): set in-component loading");
             setLoading(true);
-        } else {
+        } else if(mPopulatable.showOutOfComponentLoading()) {
             Log.d(TAG, "populateStarting(): set page-wide loading");
             setPageWideLoading(true);
         }
@@ -304,7 +304,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setLoading(false);
         hideServerErrors();
         setEmptyError(false);
-        if(mShouldStartPageLoaderAfterCachedResult && !mPopulatable.shouldShowInComponentLoadingInsteadOfOutOfComponent()) {
+        if(mShouldStartPageLoaderAfterCachedResult && !mPopulatable.showInComponentLoading()) {
             Log.d(TAG, "populateFromCache(): setPageWideLoading");
             setPageWideLoading(true);
         }
@@ -343,10 +343,10 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     public void populateFromServerError(int responseCode) {
         Log.d(TAG, "populateFromServerError()");
         mShouldStartPageLoaderAfterCachedResult = false;
-        if(mPopulatable.shouldShowServerErrorInComponentOrOutOfComponent()) {
+        if(mPopulatable.showInComponentServerError()) {
             Log.d(TAG, "populateFromServerError(): empty view content");
             setServerError(true);
-        } else {
+        } else if(mPopulatable.showOutOfComponentServerError()) {
             Log.d(TAG, "populateFromServerError(): non empty view content");
             setServerError(false);
             setServerErrorForUseWithCachedContent(true);
@@ -372,7 +372,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateWithEmptyContentFromCache() {
         Log.d(TAG, "populateWithEmptyContentFromCache()");
-        mPopulatable.clearContentWhenServerReturnsEmptyResponse();
+        mPopulatable.clearContentOnEmptyResponse();
         setLoading(false);
         hideServerErrors();
         setEmptyError(true);
@@ -391,7 +391,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateWithEmptyContentFromServer() {
         Log.d(TAG, "populateWithEmptyContentFromServer()");
-        mPopulatable.clearContentWhenServerReturnsEmptyResponse();
+        mPopulatable.clearContentOnEmptyResponse();
         setPageWideLoading(false);
         setLoading(false);
         hideServerErrors();

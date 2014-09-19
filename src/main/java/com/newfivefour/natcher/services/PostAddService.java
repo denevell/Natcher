@@ -37,7 +37,7 @@ public class PostAddService implements NetworkingServiceDelegate {
                 new NetworkingMessageBusService.GetResult<com.newfivefour.natcher.models.PostAdded, PostAddInterface>() {
                     @Override
                     public com.newfivefour.natcher.models.PostAdded getResult(PostAddInterface service) throws Exception {
-                        return service.go("bdc2c587-2d88-4b79-a5ad-e0047b219337", postAdd);
+                        return service.go("4b650a31-78cd-43d2-87a2-f081a84af249", postAdd);
                     }
                 },
                 new PostAddError(),

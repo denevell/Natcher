@@ -18,7 +18,7 @@ public class NatcherActivity extends ActionBarActivity implements MainPagePageSw
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.natcher_activity);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
         setupViewPager(mViewPager);

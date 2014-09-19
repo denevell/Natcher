@@ -7,12 +7,13 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import com.newfivefour.natcher.R;
+import com.newfivefour.natcher.app.InjectProgressSpinner;
 import com.newfivefour.natcher.models.PostAdded;
 import com.newfivefour.natcher.uicomponent.Populatable;
 import com.newfivefour.natcher.uicomponent.UiComponentDelegate;
 import com.newfivefour.natcher.uicomponent.UiComponentVanilla;
+import com.newfivefour.natcher.uicomponent.views.LoadingView;
 import com.newfivefour.natcher.uicomponent.widgets.HideKeyboardWidget;
-import com.newfivefour.natcher.uicomponent.widgets.LoadingErrorEmptyWidget;
 import com.newfivefour.natcher.uicomponent.widgets.TextViewServerErrorWidget;
 
 public class PostAddView extends FrameLayout implements
@@ -49,29 +50,39 @@ public class PostAddView extends FrameLayout implements
     }
 
     @Override
-    public boolean shouldShowInComponentLoadingInsteadOfOutOfComponent() {
+    public void clearContentOnEmptyResponse() {
+    }
+
+    @Override
+    public boolean showInComponentLoading() {
         return true;
     }
 
     @Override
-    public boolean shouldShowOutOfComponentLoadingAfterCachedContent() {
-        return false;
+    public boolean showOutOfComponentLoading() {
+        return true;
     }
 
     @Override
-    public boolean shouldShowServerErrorInComponentOrOutOfComponent() {
-        return false;
+    public boolean showInComponentServerError() {
+        return true;
     }
 
     @Override
-    public void clearContentWhenServerReturnsEmptyResponse() {
+    public boolean showOutOfComponentServerError() {
+        return true;
     }
 
     private void createUiComponent() {
         mUIComponent = new UiComponentVanilla<>(this);
-        LoadingErrorEmptyWidget loadingWidget = new LoadingErrorEmptyWidget(this, R.layout.loading_layout, -1, -1);
-        loadingWidget.showLoading(false);
-        mUIComponent.setInComponentLoadingDisplay(loadingWidget);
+        mUIComponent.setInComponentLoadingDisplay(new LoadingView() {
+            @Override
+            public void showLoading(boolean show) {
+                mContentEditText.setEnabled(!show);
+                mSubjectEditText.setEnabled(!show);
+                InjectProgressSpinner.inject(mSubjectEditText, show);
+            }
+        });
         TextViewServerErrorWidget textViewServerErrorWidget = new TextViewServerErrorWidget(getContext().getApplicationContext());
         mUIComponent.setInComponentServerErrorDisplay(textViewServerErrorWidget);
         mUIComponent.setInComponentServerErrorDisplayForUseWhenWeHaveContent(textViewServerErrorWidget);

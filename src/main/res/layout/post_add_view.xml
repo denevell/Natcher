@@ -8,11 +8,16 @@
     android:background="@android:color/holo_orange_light"
     >
 
+    <FrameLayout
+        android:id="@+id/post_add_subject_container_framelayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        >
     <EditText
         android:id="@+id/post_add_subject_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:inputType="textMultiLine|textCapSentences"
         android:imeOptions="actionDone"
         android:ems="10"
@@ -22,12 +27,13 @@
         android:textColor="#505050"
         android:textSize="26sp"
         android:gravity="start|top" />
+    </FrameLayout>
 
     <EditText
         android:id="@+id/post_add_content_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/post_add_subject_edittext"
+        android:layout_below="@+id/post_add_subject_container_framelayout"
         android:inputType="textMultiLine|textCapSentences"
         android:imeOptions="actionDone"
         android:ems="10"

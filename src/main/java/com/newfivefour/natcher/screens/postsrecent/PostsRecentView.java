@@ -61,25 +61,29 @@ public class PostsRecentView extends FrameLayout implements
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void clearContentOnEmptyResponse() {
+        mListView.setAdapter(null);
+    }
 
     @Override
-    public boolean shouldShowInComponentLoadingInsteadOfOutOfComponent() {
+    public boolean showInComponentLoading() {
         return mListView.getAdapter() == null || mListView.getAdapter().getCount() == 0;
     }
 
     @Override
-    public boolean shouldShowOutOfComponentLoadingAfterCachedContent() {
+    public boolean showOutOfComponentLoading() {
         return true;
     }
 
     @Override
-    public boolean shouldShowServerErrorInComponentOrOutOfComponent() {
+    public boolean showInComponentServerError() {
         return true;
     }
 
     @Override
-    public void clearContentWhenServerReturnsEmptyResponse() {
-        mListView.setAdapter(null);
+    public boolean showOutOfComponentServerError() {
+        return true;
     }
 
     private void setupComponent(SwipeToRefreshWidget swipe, LoadingErrorEmptyWidget loadingErrorEmptyWidget) {

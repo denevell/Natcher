@@ -1,6 +1,6 @@
 package com.newfivefour.natcher.uicomponent.widgets;
 
-import android.app.Activity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
 import com.newfivefour.natcher.uicomponent.views.LoadingView;
@@ -12,9 +12,9 @@ public class WindowLoadingSpinnerWidget implements LoadingView {
 
     private static int count = 0;
     private static final String TAG = WindowLoadingSpinnerWidget.class.getSimpleName();
-    private final Activity mActivity;
+    private final ActionBarActivity mActivity;
 
-    public WindowLoadingSpinnerWidget(Activity activity) {
+    public WindowLoadingSpinnerWidget(ActionBarActivity activity) {
         mActivity = activity;
     }
 
@@ -29,12 +29,12 @@ public class WindowLoadingSpinnerWidget implements LoadingView {
         if(mActivity==null) return;
         if(start) {
             Log.d(TAG, "Calling loading start");
-            mActivity.setProgressBarIndeterminateVisibility(true);
-            mActivity.setProgressBarVisibility(true);
+            mActivity.setSupportProgressBarIndeterminateVisibility(true);
+            mActivity.setSupportProgressBarVisibility(true);
         } else if(count==0) {
             Log.d(TAG, "Calling loading stop");
-            mActivity.setProgressBarIndeterminateVisibility(false);
-            mActivity.setProgressBarVisibility(false);
+            mActivity.setSupportProgressBarIndeterminateVisibility(false);
+            mActivity.setSupportProgressBarVisibility(false);
         }
     }
 }
