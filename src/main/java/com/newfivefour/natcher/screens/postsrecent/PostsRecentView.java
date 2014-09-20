@@ -76,7 +76,7 @@ public class PostsRecentView extends FrameLayout implements
 
     @Override
     public boolean showInComponentServerError() {
-        return true;
+        return mListView.getAdapter() == null || mListView.getAdapter().getCount() == 0;
     }
 
     @Override
