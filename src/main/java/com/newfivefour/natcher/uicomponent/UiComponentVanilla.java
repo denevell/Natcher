@@ -133,11 +133,11 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     private static String TAG = UiComponentVanilla.class.getSimpleName();
     private OnRefreshConnector mRefreshWidget;
 
-    private LoadingView mPageWideLoader;
-    private LoadingView mInComponentLoading;
+    private LoadingView mOutOfComponentLoader;
+    private LoadingView mInComponentLoader;
     private EmptyView mEmptyView;
-    private ServerErrorView mServerErrorView;
-    private ServerErrorView mServerErrorViewWhenWeHaveContent;
+    private ServerErrorView mInComponentServerErrorView;
+    private ServerErrorView mOutOfComponentServerErrorView;
     private Runnable mHideKeyboardCallback;
 
     /**
@@ -162,14 +162,15 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
      * This is because the true state will be here by default, and you'll want that
      * on a creation, since you'll be getting the data again.
      */
-    private boolean mShouldStartPageLoaderAfterCachedResult = true;
+    private boolean mStartOutOfComponentLoaderAfterCachedResult = true;
+    private boolean mStartOutOfComponentLoaderAfterCachedEmptyResult = true;
 
     public UiComponentVanilla(Populatable<T> populatable) {
         mPopulatable = populatable;
     }
 
     public UiComponentVanilla<T> setInComponentLoadingDisplay(LoadingView loadingView) {
-        mInComponentLoading = loadingView;
+        mInComponentLoader = loadingView;
         return this;
     }
 
@@ -197,18 +198,18 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
      */
 
     public UiComponentVanilla<T> setInComponentServerErrorDisplay(ServerErrorView errorComponent) {
-        mServerErrorView = errorComponent;
+        mInComponentServerErrorView = errorComponent;
         return this;
     }
 
     public UiComponentVanilla<T> setOutOfComponentServerErrorDisplay(ServerErrorView errorComponent) {
-        mServerErrorViewWhenWeHaveContent = errorComponent;
+        mOutOfComponentServerErrorView = errorComponent;
         return this;
     }
 
     public UiComponentVanilla<T> setOutOfComponentLoadingDisplay(LoadingView loadingView) {
         Log.d(TAG, "setOutOfComponentLoadingDisplay()");
-        mPageWideLoader = loadingView;
+        mOutOfComponentLoader = loadingView;
         return this;
     }
 
@@ -239,8 +240,8 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         if(mEmptyView !=null) {
             mEmptyView.setRefreshableConnector(connector);
         }
-        if(mServerErrorView !=null) {
-            mServerErrorView.setRefreshableConnector(connector);
+        if(mInComponentServerErrorView !=null) {
+            mInComponentServerErrorView.setRefreshableConnector(connector);
         }
         if(mRefreshWidget!=null) {
             mRefreshWidget.setRefreshableConnector(connector);
@@ -254,7 +255,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void onResetComponent() {
         // This will only do so if it's active
-        setPageWideLoading(false);
+        setOutOfComponentLoading(false);
         // Not really needed, since we're resetting the component, but may be useful if
         // the loading is outside the component (naughty)
         setLoading(false);
@@ -272,7 +273,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateStarting() {
         Log.d(TAG, "populateStarting()");
-        mShouldStartPageLoaderAfterCachedResult = true;
+        mStartOutOfComponentLoaderAfterCachedResult = true;
         setEmptyError(false);
         hideServerErrors();
         hideKeyboard();
@@ -281,7 +282,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
             setLoading(true);
         } else if(mPopulatable.showOutOfComponentLoading()) {
             Log.d(TAG, "populateStarting(): set page-wide loading");
-            setPageWideLoading(true);
+            setOutOfComponentLoading(true);
         }
     }
 
@@ -304,9 +305,9 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         setLoading(false);
         hideServerErrors();
         setEmptyError(false);
-        if(mShouldStartPageLoaderAfterCachedResult && !mPopulatable.showInComponentLoading()) {
-            Log.d(TAG, "populateFromCache(): setPageWideLoading");
-            setPageWideLoading(true);
+        if(mStartOutOfComponentLoaderAfterCachedResult && mPopulatable.showOutOfComponentLoading()) {
+            Log.d(TAG, "populateFromCache(): setOutOfComponentLoading");
+            setOutOfComponentLoading(true);
         }
     }
 
@@ -321,9 +322,9 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateFromServer(T ob) {
         Log.d(TAG, "populateFromServer()");
-        mShouldStartPageLoaderAfterCachedResult = false;
+        mStartOutOfComponentLoaderAfterCachedResult = false;
         mPopulatable.populateOnSuccessfulResponse(ob);
-        setPageWideLoading(false);
+        setOutOfComponentLoading(false);
         setLoading(false);
         hideServerErrors();
         setEmptyError(false);
@@ -342,16 +343,17 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateFromServerError(int responseCode) {
         Log.d(TAG, "populateFromServerError()");
-        mShouldStartPageLoaderAfterCachedResult = false;
+        mStartOutOfComponentLoaderAfterCachedResult = false;
         if(mPopulatable.showInComponentServerError()) {
             Log.d(TAG, "populateFromServerError(): empty view content");
-            setServerError(true);
+            setOutOfComponentServerError(false);
+            setInComponentServerError(true);
         } else if(mPopulatable.showOutOfComponentServerError()) {
             Log.d(TAG, "populateFromServerError(): non empty view content");
-            setServerError(false);
-            setServerErrorForUseWithCachedContent(true);
+            setInComponentServerError(false);
+            setOutOfComponentServerError(true);
         }
-        setPageWideLoading(false);
+        setOutOfComponentLoading(false);
         setLoading(false);
         setEmptyError(false);
     }
@@ -374,6 +376,9 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         Log.d(TAG, "populateWithEmptyContentFromCache()");
         mPopulatable.clearContentOnEmptyResponse();
         setLoading(false);
+        if(mStartOutOfComponentLoaderAfterCachedEmptyResult && mPopulatable.showOutOfComponentLoading()) {
+            setOutOfComponentLoading(true);
+        }
         hideServerErrors();
         setEmptyError(true);
     }
@@ -391,33 +396,34 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateWithEmptyContentFromServer() {
         Log.d(TAG, "populateWithEmptyContentFromServer()");
+        mStartOutOfComponentLoaderAfterCachedEmptyResult = false;
         mPopulatable.clearContentOnEmptyResponse();
-        setPageWideLoading(false);
+        setOutOfComponentLoading(false);
         setLoading(false);
         hideServerErrors();
         setEmptyError(true);
     }
 
     private void setLoading(boolean show) {
-        if(mInComponentLoading!=null) {
-            mInComponentLoading.showLoading(show);
+        if(mInComponentLoader !=null) {
+            mInComponentLoader.showLoading(show);
         }
     }
 
     private void hideServerErrors() {
-        setServerError(false);
-        setServerErrorForUseWithCachedContent(false);
+        setInComponentServerError(false);
+        setOutOfComponentServerError(false);
     }
 
-    private void setServerError(boolean show) {
-        if(mServerErrorView !=null) {
-            mServerErrorView.showServerError(show);
+    private void setInComponentServerError(boolean show) {
+        if(mInComponentServerErrorView !=null) {
+            mInComponentServerErrorView.showServerError(show);
         }
     }
 
-    private void setServerErrorForUseWithCachedContent(boolean show) {
-        if(mServerErrorViewWhenWeHaveContent !=null) {
-            mServerErrorViewWhenWeHaveContent.showServerError(show);
+    private void setOutOfComponentServerError(boolean show) {
+        if(mOutOfComponentServerErrorView !=null) {
+            mOutOfComponentServerErrorView.showServerError(show);
         }
     }
 
@@ -427,8 +433,8 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         }
     }
 
-    private void setPageWideLoading(boolean show) {
-        if(mPageWideLoader !=null) {
+    private void setOutOfComponentLoading(boolean show) {
+        if(mOutOfComponentLoader !=null) {
             if(show && mPageWideLoadingStarted) {
                 return;
             }
@@ -436,7 +442,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
                 return;
             }
             mPageWideLoadingStarted = show;
-            mPageWideLoader.showLoading(show);
+            mOutOfComponentLoader.showLoading(show);
         }
     }
 
