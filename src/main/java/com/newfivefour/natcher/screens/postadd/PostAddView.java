@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.newfivefour.natcher.R;
 import com.newfivefour.natcher.app.InjectProgressSpinner;
@@ -80,7 +81,9 @@ public class PostAddView extends FrameLayout implements
             public void showLoading(boolean show) {
                 mContentEditText.setEnabled(!show);
                 mSubjectEditText.setEnabled(!show);
-                InjectProgressSpinner.inject(mSubjectEditText, show);
+                InjectProgressSpinner.inject(mContentEditText, show, R.attr.progressBarMy,
+                        0, 0, 0, 0,
+                        RelativeLayout.CENTER_IN_PARENT);
             }
         });
         TextViewServerErrorWidget textViewServerErrorWidget = new TextViewServerErrorWidget(getContext().getApplicationContext());

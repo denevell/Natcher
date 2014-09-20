@@ -3,6 +3,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="progressBarPadding">0dip</item>
+        <item name="progressBarMy">@android:style/Widget.Holo.ProgressBar</item>
     </style>
 
     <style name="subject_text" parent="android:TextAppearance.Holo.Large">
