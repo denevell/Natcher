@@ -2,12 +2,12 @@ package com.newfivefour.natcher.uicomponent;
 
 import android.util.Log;
 
-import com.newfivefour.natcher.uicomponent.events.OnEmpty;
-import com.newfivefour.natcher.uicomponent.events.OnRefresh;
-import com.newfivefour.natcher.uicomponent.events.OnRefreshConnector;
-import com.newfivefour.natcher.uicomponent.views.EmptyView;
-import com.newfivefour.natcher.uicomponent.views.LoadingView;
-import com.newfivefour.natcher.uicomponent.views.ServerErrorView;
+import com.newfivefour.natcher.uicomponent.events.OnEmptyCallback;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshCallback;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshWidget;
+import com.newfivefour.natcher.uicomponent.views.EmptyDisplay;
+import com.newfivefour.natcher.uicomponent.views.LoadingDisplay;
+import com.newfivefour.natcher.uicomponent.views.ServerErrorDisplay;
 
 /**
  * Allows your component to enjoy all the goodness of a UiComponent
@@ -131,13 +131,13 @@ import com.newfivefour.natcher.uicomponent.views.ServerErrorView;
  */
 public class UiComponentVanilla<T> implements UiComponent<T> {
     private static String TAG = UiComponentVanilla.class.getSimpleName();
-    private OnRefreshConnector mRefreshWidget;
+    private OnRefreshWidget mRefreshWidget;
 
-    private LoadingView mOutOfComponentLoader;
-    private LoadingView mInComponentLoader;
-    private EmptyView mEmptyView;
-    private ServerErrorView mInComponentServerErrorView;
-    private ServerErrorView mOutOfComponentServerErrorView;
+    private LoadingDisplay mOutOfComponentLoader;
+    private LoadingDisplay mInComponentLoader;
+    private EmptyDisplay mEmptyDisplay;
+    private ServerErrorDisplay mInComponentServerErrorDisplay;
+    private ServerErrorDisplay mOutOfComponentServerErrorDisplay;
     private Runnable mHideKeyboardCallback;
 
     /**
@@ -168,36 +168,36 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         mPopulatable = populatable;
     }
 
-    public UiComponentVanilla<T> setInComponentLoadingDisplay(LoadingView loadingView) {
-        mInComponentLoader = loadingView;
+    public UiComponentVanilla<T> setInComponentLoadingDisplay(LoadingDisplay loadingDisplay) {
+        mInComponentLoader = loadingDisplay;
         return this;
     }
 
-    public UiComponentVanilla<T> setEmptyDisplay(EmptyView emptyView) {
-        mEmptyView = emptyView;
+    public UiComponentVanilla<T> setEmptyDisplay(EmptyDisplay emptyDisplay) {
+        mEmptyDisplay = emptyDisplay;
         return this;
     }
 
-    public UiComponentVanilla<T> setInComponentServerErrorDisplay(ServerErrorView errorComponent) {
-        mInComponentServerErrorView = errorComponent;
+    public UiComponentVanilla<T> setInComponentServerErrorDisplay(ServerErrorDisplay errorComponent) {
+        mInComponentServerErrorDisplay = errorComponent;
         return this;
     }
 
-    public UiComponentVanilla<T> setOutOfComponentServerErrorDisplay(ServerErrorView errorComponent) {
-        mOutOfComponentServerErrorView = errorComponent;
+    public UiComponentVanilla<T> setOutOfComponentServerErrorDisplay(ServerErrorDisplay errorComponent) {
+        mOutOfComponentServerErrorDisplay = errorComponent;
         return this;
     }
 
-    public UiComponentVanilla<T> setOutOfComponentLoadingDisplay(LoadingView loadingView) {
+    public UiComponentVanilla<T> setOutOfComponentLoadingDisplay(LoadingDisplay loadingDisplay) {
         Log.d(TAG, "setOutOfComponentLoadingDisplay()");
-        mOutOfComponentLoader = loadingView;
+        mOutOfComponentLoader = loadingDisplay;
         return this;
     }
 
     /**
      * @param refreshWidget This will be given the OnRefresh callback when it's set on the UiComponent
      */
-    public UiComponentVanilla<T> setRefreshWidget(OnRefreshConnector refreshWidget) {
+    public UiComponentVanilla<T> setRefreshWidget(OnRefreshWidget refreshWidget) {
         mRefreshWidget = refreshWidget;
         return this;
     }
@@ -208,24 +208,27 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     }
 
     @Override
-    public void setEmptyConnector(OnEmpty connector) {
-        Log.d(TAG, "setEmptyConnector()");
-        if(mEmptyView !=null) {
-            mEmptyView.setEmptyConnector(connector);
+    public void setEmptyCallback(OnEmptyCallback callback) {
+        Log.d(TAG, "setEmptyCallback()");
+        if(mEmptyDisplay !=null) {
+            mEmptyDisplay.setEmptyCallback(callback);
         }
     }
 
+    /**
+     * Should be called after the empty, refresh, in component server errors are added
+     */
     @Override
-    public void setRefreshableConnector(OnRefresh connector) {
-        Log.d(TAG, "setRefreshableConnector()");
-        if(mEmptyView !=null) {
-            mEmptyView.setRefreshableConnector(connector);
+    public void setRefreshableCallback(OnRefreshCallback callback) {
+        Log.d(TAG, "setRefreshableCallback()");
+        if(mEmptyDisplay !=null) {
+            mEmptyDisplay.setRefreshableCallback(callback);
         }
-        if(mInComponentServerErrorView !=null) {
-            mInComponentServerErrorView.setRefreshableConnector(connector);
+        if(mInComponentServerErrorDisplay !=null) {
+            mInComponentServerErrorDisplay.setRefreshableCallback(callback);
         }
         if(mRefreshWidget!=null) {
-            mRefreshWidget.setRefreshableConnector(connector);
+            mRefreshWidget.setRefreshableCallback(callback);
         }
     }
 
@@ -398,20 +401,20 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     }
 
     private void setInComponentServerError(boolean show, int code, String message) {
-        if(mInComponentServerErrorView !=null) {
-            mInComponentServerErrorView.showServerError(show, code, message);
+        if(mInComponentServerErrorDisplay !=null) {
+            mInComponentServerErrorDisplay.showServerError(show, code, message);
         }
     }
 
     private void setOutOfComponentServerError(boolean show, int code, String message) {
-        if(mOutOfComponentServerErrorView !=null) {
-            mOutOfComponentServerErrorView.showServerError(show, code, message);
+        if(mOutOfComponentServerErrorDisplay !=null) {
+            mOutOfComponentServerErrorDisplay.showServerError(show, code, message);
         }
     }
 
     private void setEmptyError(boolean show) {
-        if(mEmptyView !=null) {
-            mEmptyView.showEmpty(show);
+        if(mEmptyDisplay !=null) {
+            mEmptyDisplay.showEmpty(show);
         }
     }
 

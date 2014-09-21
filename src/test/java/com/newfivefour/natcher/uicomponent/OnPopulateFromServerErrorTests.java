@@ -1,8 +1,8 @@
 package com.newfivefour.natcher.uicomponent;
 
-import com.newfivefour.natcher.uicomponent.views.EmptyView;
-import com.newfivefour.natcher.uicomponent.views.LoadingView;
-import com.newfivefour.natcher.uicomponent.views.ServerErrorView;
+import com.newfivefour.natcher.uicomponent.views.EmptyDisplay;
+import com.newfivefour.natcher.uicomponent.views.LoadingDisplay;
+import com.newfivefour.natcher.uicomponent.views.ServerErrorDisplay;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,34 +20,34 @@ public class OnPopulateFromServerErrorTests {
 
     private final Populatable populatable;
     private final UiComponentVanilla<Object> uiComponent;
-    private final LoadingView loaderInComponent;
-    private final LoadingView loaderOutOfComponent;
-    private final EmptyView emptyView;
-    private final ServerErrorView serverErrorViewInComponent;
-    private final ServerErrorView serverErrorViewOutOfComponent;
+    private final LoadingDisplay loaderInComponent;
+    private final LoadingDisplay loaderOutOfComponent;
+    private final EmptyDisplay emptyDisplay;
+    private final ServerErrorDisplay serverErrorDisplayInComponent;
+    private final ServerErrorDisplay serverErrorDisplayOutOfComponent;
 
     public OnPopulateFromServerErrorTests() {
         populatable = mock(Populatable.class);
 
-        loaderInComponent = mock(LoadingView.class);
-        loaderOutOfComponent = mock(LoadingView.class);
-        emptyView = mock(EmptyView.class);
-        serverErrorViewInComponent = mock(ServerErrorView.class);
-        serverErrorViewOutOfComponent = mock(ServerErrorView.class);
+        loaderInComponent = mock(LoadingDisplay.class);
+        loaderOutOfComponent = mock(LoadingDisplay.class);
+        emptyDisplay = mock(EmptyDisplay.class);
+        serverErrorDisplayInComponent = mock(ServerErrorDisplay.class);
+        serverErrorDisplayOutOfComponent = mock(ServerErrorDisplay.class);
 
         uiComponent = new UiComponentVanilla<Object>(populatable);
         uiComponent.setInComponentLoadingDisplay(loaderInComponent);
         uiComponent.setOutOfComponentLoadingDisplay(loaderOutOfComponent);
-        uiComponent.setOutOfComponentServerErrorDisplay(serverErrorViewOutOfComponent);
-        uiComponent.setInComponentServerErrorDisplay(serverErrorViewInComponent);
-        uiComponent.setEmptyDisplay(emptyView);
+        uiComponent.setOutOfComponentServerErrorDisplay(serverErrorDisplayOutOfComponent);
+        uiComponent.setInComponentServerErrorDisplay(serverErrorDisplayInComponent);
+        uiComponent.setEmptyDisplay(emptyDisplay);
     }
 
     @Test
     public void shouldHideEmptyView() {
         // Act
         uiComponent.populateFromServerError(400, "a");
-        verify(emptyView).showEmpty(false);
+        verify(emptyDisplay).showEmpty(false);
     }
 
     @Test
@@ -75,8 +75,8 @@ public class OnPopulateFromServerErrorTests {
 
         // Act
         uiComponent.populateFromServerError(400, "a");
-        verify(serverErrorViewInComponent).showServerError(true, 400, "a");
-        verify(serverErrorViewOutOfComponent).showServerError(false, 0, null);
+        verify(serverErrorDisplayInComponent).showServerError(true, 400, "a");
+        verify(serverErrorDisplayOutOfComponent).showServerError(false, 0, null);
     }
 
     @Test
@@ -86,8 +86,8 @@ public class OnPopulateFromServerErrorTests {
 
         // Act
         uiComponent.populateFromServerError(400, "a");
-        verify(serverErrorViewInComponent).showServerError(false, 0, null);
-        verify(serverErrorViewOutOfComponent).showServerError(true, 400, "a");
+        verify(serverErrorDisplayInComponent).showServerError(false, 0, null);
+        verify(serverErrorDisplayOutOfComponent).showServerError(true, 400, "a");
     }
 
 }

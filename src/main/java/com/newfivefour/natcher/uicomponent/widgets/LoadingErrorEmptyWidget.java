@@ -7,13 +7,13 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.newfivefour.natcher.uicomponent.events.OnEmpty;
+import com.newfivefour.natcher.uicomponent.events.OnEmptyCallback;
 import com.newfivefour.natcher.uicomponent.events.OnEmptyConnector;
-import com.newfivefour.natcher.uicomponent.events.OnRefresh;
-import com.newfivefour.natcher.uicomponent.events.OnRefreshConnector;
-import com.newfivefour.natcher.uicomponent.views.EmptyView;
-import com.newfivefour.natcher.uicomponent.views.LoadingView;
-import com.newfivefour.natcher.uicomponent.views.ServerErrorView;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshCallback;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshWidget;
+import com.newfivefour.natcher.uicomponent.views.EmptyDisplay;
+import com.newfivefour.natcher.uicomponent.views.LoadingDisplay;
+import com.newfivefour.natcher.uicomponent.views.ServerErrorDisplay;
 
 /**
  * Can be used a LoadingView, ServerErrorView and EmptyView as a quick
@@ -22,11 +22,11 @@ import com.newfivefour.natcher.uicomponent.views.ServerErrorView;
  * Adds a error, empty and loading layout to end of the passed ViewGroup.
  */
 public class LoadingErrorEmptyWidget implements
-        OnRefreshConnector,
+        OnRefreshWidget,
         OnEmptyConnector,
-        LoadingView,
-        EmptyView,
-        ServerErrorView {
+        LoadingDisplay,
+        EmptyDisplay,
+        ServerErrorDisplay {
     private static final String TAG = LoadingErrorEmptyWidget.class.getSimpleName();
     private View mError;
     private View mEmpty;
@@ -111,21 +111,21 @@ public class LoadingErrorEmptyWidget implements
     }
 
     @Override
-    public void setRefreshableConnector(final OnRefresh connector) {
+    public void setRefreshableCallback(final OnRefreshCallback connector) {
         if(connector==null) return;
-        if(mError!=null && mError instanceof OnRefreshConnector) {
-            ((OnRefreshConnector)mError).setRefreshableConnector(connector);
+        if(mError!=null && mError instanceof OnRefreshWidget) {
+            ((OnRefreshWidget)mError).setRefreshableCallback(connector);
         }
-        if(mEmpty !=null && mEmpty instanceof OnRefreshConnector) {
-            ((OnRefreshConnector)mEmpty).setRefreshableConnector(connector);
+        if(mEmpty !=null && mEmpty instanceof OnRefreshWidget) {
+            ((OnRefreshWidget)mEmpty).setRefreshableCallback(connector);
         }
     }
 
     @Override
-    public void setEmptyConnector(OnEmpty connector) {
+    public void setEmptyCallback(OnEmptyCallback connector) {
         if(connector==null) return;
         if(mEmpty !=null && mEmpty instanceof OnEmptyConnector) {
-            ((OnEmptyConnector)mEmpty).setEmptyConnector(connector);
+            ((OnEmptyConnector)mEmpty).setEmptyCallback(connector);
         }
     }
 

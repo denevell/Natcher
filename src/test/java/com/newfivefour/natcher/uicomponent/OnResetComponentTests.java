@@ -1,6 +1,6 @@
 package com.newfivefour.natcher.uicomponent;
 
-import com.newfivefour.natcher.uicomponent.views.LoadingView;
+import com.newfivefour.natcher.uicomponent.views.LoadingDisplay;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,14 +19,14 @@ public class OnResetComponentTests {
 
     private final Populatable populatable;
     private final UiComponentVanilla<Object> uiComponent;
-    private final LoadingView loaderInComponent;
-    private final LoadingView loaderOutOfComponent;
+    private final LoadingDisplay loaderInComponent;
+    private final LoadingDisplay loaderOutOfComponent;
 
     public OnResetComponentTests() {
         populatable = mock(Populatable.class);
 
-        loaderInComponent = mock(LoadingView.class);
-        loaderOutOfComponent = mock(LoadingView.class);
+        loaderInComponent = mock(LoadingDisplay.class);
+        loaderOutOfComponent = mock(LoadingDisplay.class);
 
         uiComponent = new UiComponentVanilla<Object>(populatable);
         uiComponent.setInComponentLoadingDisplay(loaderInComponent);

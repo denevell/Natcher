@@ -3,10 +3,10 @@ package com.newfivefour.natcher.uicomponent.widgets;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.newfivefour.natcher.uicomponent.events.OnRefresh;
-import com.newfivefour.natcher.uicomponent.views.ServerErrorView;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshCallback;
+import com.newfivefour.natcher.uicomponent.views.ServerErrorDisplay;
 
-public class TextViewServerErrorWidget implements ServerErrorView {
+public class TextViewServerErrorWidget implements ServerErrorDisplay {
 
     private final Context mApplicationContext;
 
@@ -14,7 +14,7 @@ public class TextViewServerErrorWidget implements ServerErrorView {
         mApplicationContext = applicationContext;
     }
 
-    @Override public void setRefreshableConnector(OnRefresh connector) { }
+    @Override public void setRefreshableCallback(OnRefreshCallback connector) { }
     @Override
     public void showServerError(boolean show, int code, String message) {
         if (show) {

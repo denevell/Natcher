@@ -1,7 +1,7 @@
 package com.newfivefour.natcher.uicomponent;
 
 import com.newfivefour.natcher.uicomponent.events.OnEmptyConnector;
-import com.newfivefour.natcher.uicomponent.events.OnRefreshConnector;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshWidget;
 
 /**
  * Allows your component to enjoy all the goodness of a UiComponent
@@ -15,7 +15,7 @@ import com.newfivefour.natcher.uicomponent.events.OnRefreshConnector;
  *
  * @see com.newfivefour.natcher.uicomponent.UiComponentVanilla
  */
-public interface UiComponent<T> extends OnRefreshConnector, OnEmptyConnector {
+public interface UiComponent<T> extends OnRefreshWidget, OnEmptyConnector {
 
     /**
      * Called when the component is destroyed.

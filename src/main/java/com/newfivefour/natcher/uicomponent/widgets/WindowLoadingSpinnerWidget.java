@@ -3,12 +3,12 @@ package com.newfivefour.natcher.uicomponent.widgets;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
-import com.newfivefour.natcher.uicomponent.views.LoadingView;
+import com.newfivefour.natcher.uicomponent.views.LoadingDisplay;
 
 /**
  * Can be used if we're using something other than the swipe to refresh pattern for loading.
  */
-public class WindowLoadingSpinnerWidget implements LoadingView {
+public class WindowLoadingSpinnerWidget implements LoadingDisplay {
 
     private static int count = 0;
     private static final String TAG = WindowLoadingSpinnerWidget.class.getSimpleName();

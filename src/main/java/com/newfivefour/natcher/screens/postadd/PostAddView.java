@@ -13,7 +13,7 @@ import com.newfivefour.natcher.models.PostAdded;
 import com.newfivefour.natcher.uicomponent.Populatable;
 import com.newfivefour.natcher.uicomponent.UiComponentDelegate;
 import com.newfivefour.natcher.uicomponent.UiComponentVanilla;
-import com.newfivefour.natcher.uicomponent.views.LoadingView;
+import com.newfivefour.natcher.uicomponent.views.LoadingDisplay;
 import com.newfivefour.natcher.uicomponent.widgets.HideKeyboardWidget;
 import com.newfivefour.natcher.uicomponent.widgets.TextViewServerErrorWidget;
 
@@ -76,7 +76,7 @@ public class PostAddView extends FrameLayout implements
 
     private void createUiComponent() {
         mUIComponent = new UiComponentVanilla<>(this);
-        mUIComponent.setInComponentLoadingDisplay(new LoadingView() {
+        mUIComponent.setInComponentLoadingDisplay(new LoadingDisplay() {
             @Override
             public void showLoading(boolean show) {
                 mContentEditText.setEnabled(!show);

@@ -7,10 +7,10 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.newfivefour.natcher.R;
-import com.newfivefour.natcher.uicomponent.events.OnRefresh;
-import com.newfivefour.natcher.uicomponent.events.OnRefreshConnector;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshCallback;
+import com.newfivefour.natcher.uicomponent.events.OnRefreshWidget;
 
-public class ErrorViewGeneric extends FrameLayout implements OnRefreshConnector {
+public class ErrorViewGeneric extends FrameLayout implements OnRefreshWidget {
 
     public ErrorViewGeneric(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -22,7 +22,7 @@ public class ErrorViewGeneric extends FrameLayout implements OnRefreshConnector 
     }
 
     @Override
-    public void setRefreshableConnector(final OnRefresh connector) {
+    public void setRefreshableCallback(final OnRefreshCallback connector) {
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
