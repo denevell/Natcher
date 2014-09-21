@@ -1,10 +1,6 @@
 package com.newfivefour.natcher.uicomponent;
 
 /**
- * 1. What about when we get an empty result returned by the cache, but we want to show the in component loader
- * until the server has returned a real value or the server has returned an error? Don't send the empty cached result
- * back from the networking code?
- *
  * Used by the UiComponentVanilla class so
  * 1. It knows how to populate a view,
  * 2. If that view is empty to decide which loader (page or component) to show,

@@ -230,6 +230,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     }
 
     /**
+     * Used so we can unset the out of component loader, to stop is loading forever.
      * Hide:
      * 1. All loaders
      */

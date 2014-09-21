@@ -87,4 +87,8 @@ public class OnPopulateFromCacheAsEmpty {
         verify(loaderOutOfComponent).showLoading(true);
     }
 
+    // Don't show loader if callback says no
+    // Don't show loader if not set
+    // Don't show loader if server has returned
+
 }
