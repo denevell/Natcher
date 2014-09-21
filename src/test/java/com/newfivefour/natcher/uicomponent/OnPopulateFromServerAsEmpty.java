@@ -10,14 +10,13 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
 @SuppressWarnings("unchecked")
-public class OnPopulateFromCacheAsEmpty {
+public class OnPopulateFromServerAsEmpty {
 
     private final Populatable populatable;
     private final UiComponentVanilla<Object> uiComponent;
@@ -27,7 +26,7 @@ public class OnPopulateFromCacheAsEmpty {
     private final ServerErrorView serverErrorViewInComponent;
     private final ServerErrorView serverErrorViewOutOfComponent;
 
-    public OnPopulateFromCacheAsEmpty() {
+    public OnPopulateFromServerAsEmpty() {
         populatable = mock(Populatable.class);
 
         loaderInComponent = mock(LoadingView.class);
@@ -47,14 +46,14 @@ public class OnPopulateFromCacheAsEmpty {
     @Test
     public void shouldSetEmptyView() {
         // Act
-        uiComponent.populateWithEmptyContentFromCache();
+        uiComponent.populateWithEmptyContentFromServer();
         verify(emptyView).showEmpty(true);
     }
 
     @Test
     public void shouldClearContent() {
         // Act
-        uiComponent.populateWithEmptyContentFromCache();
+        uiComponent.populateWithEmptyContentFromServer();
         verify(populatable).clearContentOnEmptyResponse();
     }
 
@@ -62,7 +61,7 @@ public class OnPopulateFromCacheAsEmpty {
     @Test
     public void shouldHideServerErrors() {
         // Act
-        uiComponent.populateWithEmptyContentFromCache();
+        uiComponent.populateWithEmptyContentFromServer();
         verify(serverErrorViewInComponent).showServerError(false, 0, null);
         verify(serverErrorViewOutOfComponent).showServerError(false, 0, null);
     }
@@ -70,62 +69,20 @@ public class OnPopulateFromCacheAsEmpty {
     @Test
     public void shouldHideInComponentLoader() {
         // Act
-        uiComponent.populateWithEmptyContentFromCache();
+        uiComponent.populateWithEmptyContentFromServer();
         verify(loaderInComponent).showLoading(false);
     }
 
     @Test
-    public void shouldShowOutOfComponentLoaderWhenActiveAndCallbackSaysOkay() {
+    public void shouldHideOutOfComponentLoaderIfActive() {
         // Arrange
-        uiComponent.populateStarting();
+        when(populatable.showInComponentLoading()).thenReturn(false);
         when(populatable.showOutOfComponentLoading()).thenReturn(true);
-
-        // Act
-        uiComponent.populateWithEmptyContentFromCache();
-        verify(loaderOutOfComponent).showLoading(true);
-    }
-
-    @Test
-    public void shouldNotShowOutOfComponentLoaderWhenActiveAndCallbackSaysNo() {
-        // Arrange
         uiComponent.populateStarting();
-        when(populatable.showOutOfComponentLoading()).thenReturn(false);
 
         // Act
-        uiComponent.populateWithEmptyContentFromCache();
-        verify(loaderOutOfComponent, never()).showLoading(true);
-    }
-
-    @Test
-    public void shouldNotShowOutOfComponentIfNotSetLoading() {
-        // Arrange
-        // uiComponent.populateStarting(); i.e. not set
-
-        // Act
-        uiComponent.populateWithEmptyContentFromCache();
-        verify(loaderOutOfComponent, never()).showLoading(true);
-    }
-
-    @Test
-    public void shouldNotShowOutOfComponentIfServerReturnedValueAlready() {
-        // Arrange
-        uiComponent.populateStarting();
-        uiComponent.populateFromServer(new Object());
-
-        // Act
-        uiComponent.populateWithEmptyContentFromCache();
-        verify(loaderOutOfComponent, never()).showLoading(true);
-    }
-
-    @Test
-    public void shouldNotShowOutOfComponentIfServerReturnedEmptyValueAlready() {
-        // Arrange
-        uiComponent.populateStarting();
         uiComponent.populateWithEmptyContentFromServer();
-
-        // Act
-        uiComponent.populateWithEmptyContentFromCache();
-        verify(loaderOutOfComponent, never()).showLoading(true);
+        verify(loaderOutOfComponent).showLoading(false);
     }
 
 }
