@@ -5,7 +5,7 @@ import android.os.Bundle;
 import com.newfivefour.natcher.networking.NetworkingMessageBusService;
 import com.newfivefour.natcher.networking.ResponseEmpty;
 import com.newfivefour.natcher.networking.ResponseError;
-import com.newfivefour.natcher.networking.ServerOrCachedResponse;
+import com.newfivefour.natcher.networking.ResponseServerOrCached;
 
 import java.util.List;
 
@@ -25,8 +25,9 @@ public class PostsRecentService {
                 .doNotReRequestExistingRequest(f)
                 .cacheRequest("/post/0/10")
                 .detectEmptyResponse(new NetworkingMessageBusService.IsEmpty<RecentPosts>() {
-                                         @Override public boolean isEmpty(RecentPosts res) {
-                                             return res.getPosts()==null || res.getPosts().size()==0;
+                                         @Override
+                                         public boolean isEmpty(RecentPosts res) {
+                                             return res.getPosts() == null || res.getPosts().size() == 0;
                                          }
                                      },
                         new RecentPostsEmpty())
@@ -51,7 +52,7 @@ public class PostsRecentService {
 
     public static class RecentPostsError extends ResponseError {}
     public static class RecentPostsEmpty extends ResponseEmpty {}
-    public static class RecentPosts extends ServerOrCachedResponse {
+    public static class RecentPosts extends ResponseServerOrCached {
 
         private List<Post> posts;
 

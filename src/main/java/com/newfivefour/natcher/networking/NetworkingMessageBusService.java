@@ -29,7 +29,7 @@ import retrofit.converter.GsonConverter;
  * 6. Sending events on empty content from server
  * 7. Returning cached responses if Etags or the like are used.
  */
-public class NetworkingMessageBusService<ReturnResult extends ServerOrCachedResponse, ServiceClass> {
+public class NetworkingMessageBusService<ReturnResult extends ResponseServerOrCached, ServiceClass> {
 
     private static final String TAG = NetworkingMessageBusService.class.getSimpleName();
     private static final int SIZE_OF_RESPONSE_CACHE = 10000 * 5;
@@ -47,7 +47,7 @@ public class NetworkingMessageBusService<ReturnResult extends ServerOrCachedResp
         public boolean isEmpty(ReturnResult result);
     }
 
-    public static class Builder<ReturnResult extends ServerOrCachedResponse, ServiceClass> {
+    public static class Builder<ReturnResult extends ResponseServerOrCached, ServiceClass> {
         private Converter converter = new GsonConverter(new Gson());
         private String cachedResponseUri;
         private Bundle requestUuidBundle;
