@@ -89,7 +89,7 @@ public class PostsRecentView extends FrameLayout implements
         mUIComponent
                 .setInComponentLoadingDisplay(swipe)
                 .setOutOfComponentLoadingDisplay(swipe)
-                .setInComponentEmptyDisplay(loadingErrorEmptyWidget)
+                .setEmptyDisplay(loadingErrorEmptyWidget)
                 .setInComponentServerErrorDisplay(loadingErrorEmptyWidget)
                 .setOutOfComponentServerErrorDisplay(new TextViewServerErrorWidget(getContext().getApplicationContext()))
                 .setRefreshWidget(swipe);

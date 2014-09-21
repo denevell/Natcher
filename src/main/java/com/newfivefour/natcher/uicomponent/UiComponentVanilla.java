@@ -174,28 +174,10 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         return this;
     }
 
-    public UiComponentVanilla<T> setInComponentEmptyDisplay(EmptyView emptyView) {
+    public UiComponentVanilla<T> setEmptyDisplay(EmptyView emptyView) {
         mEmptyView = emptyView;
         return this;
     }
-
-    /**
-     * 1. So, we have this view. A normal custom view.
-     *
-     * 2. It has a delegate interface.
-     *
-     * This means that, like many other views, other will be able to access an object
-     * it has: the object allows the caller to manipulate the view.
-     *
-     * 3. There are two particular methods on this component that allow the caller to
-     * specify something happens on an event.
-     *
-     *  3.1. One of these methods allows the caller to say something should happen when
-     *  the component presses refresh.
-     *
-     *  3.2 Another one of these methods allows the caller to say something should the
-     * component have an empty view.
-     */
 
     public UiComponentVanilla<T> setInComponentServerErrorDisplay(ServerErrorView errorComponent) {
         mInComponentServerErrorView = errorComponent;
@@ -274,6 +256,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     public void populateStarting() {
         Log.d(TAG, "populateStarting()");
         mStartOutOfComponentLoaderAfterCachedResult = true;
+        mStartOutOfComponentLoaderAfterCachedEmptyResult = true;
         setEmptyError(false);
         hideServerErrors();
         hideKeyboard();
@@ -344,6 +327,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     public void populateFromServerError(int responseCode) {
         Log.d(TAG, "populateFromServerError()");
         mStartOutOfComponentLoaderAfterCachedResult = false;
+        mStartOutOfComponentLoaderAfterCachedEmptyResult = false;
         if(mPopulatable.showInComponentServerError()) {
             Log.d(TAG, "populateFromServerError(): empty view content");
             setOutOfComponentServerError(false);
