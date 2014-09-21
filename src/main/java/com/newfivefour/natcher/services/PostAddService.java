@@ -23,7 +23,7 @@ public class PostAddService implements NetworkingServiceDelegate {
     @SuppressWarnings("unchecked")
     public PostAddService(Bundle f) {
         mService = new Builder<PostAdded, PostAddInterface>()
-                        .dontRerequestExistingRequest(f)
+                        .doNotReRequestExistingRequest(f)
                         .create();
     }
 

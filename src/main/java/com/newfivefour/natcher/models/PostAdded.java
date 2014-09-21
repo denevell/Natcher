@@ -1,5 +1,8 @@
 package com.newfivefour.natcher.models;
 
-public class PostAdded {
+import com.newfivefour.natcher.networking.ServerOrCachedResponse;
+
+public class PostAdded extends ServerOrCachedResponse {
     public ThreadOutput thread;
+
 }

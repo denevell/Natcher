@@ -29,14 +29,13 @@ import retrofit.converter.GsonConverter;
  * 6. Sending events on empty content from server
  * 7. Returning cached responses if Etags or the like are used.
  */
-public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
+public class NetworkingMessageBusService<ReturnResult extends ServerOrCachedResponse, ServiceClass> {
 
     private static final String TAG = NetworkingMessageBusService.class.getSimpleName();
     private static final int SIZE_OF_RESPONSE_CACHE = 10000 * 5;
-    private final CachedResponse<ReturnResult> mCacheResponse;
     private final String mCachedResponseUri;
     private final Bundle mRequestUuidBundle;
-    private final IsEmpty mIsEmptyCallback;
+    private final IsEmpty<ReturnResult> mIsEmptyCallback;
     private final ResponseEmpty mIsEmptyObject;
     private final Converter mConverter;
 
@@ -48,44 +47,18 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
         public boolean isEmpty(ReturnResult result);
     }
 
-    public static class CachedResponse<ReturnResult> {
-        private ReturnResult mRes;
-
-        public CachedResponse<ReturnResult> setCache(ReturnResult res) {
-            mRes = res;
-            return this;
-        }
-        public ReturnResult returnCached() {
-            return mRes;
-        }
-    }
-
-    public static class Builder<ReturnResult, ServiceClass> {
+    public static class Builder<ReturnResult extends ServerOrCachedResponse, ServiceClass> {
         private Converter converter = new GsonConverter(new Gson());
-        private CachedResponse<ReturnResult> cacheResponse;
         private String cachedResponseUri;
         private Bundle requestUuidBundle;
         private ResponseEmpty isEmptyObject;
-        private IsEmpty isEmptyCallback;
+        private IsEmpty<ReturnResult> isEmptyCallback;
 
         /**
         * @param converter The Retrofit mConverter, GsonConverter normally and by default
         */
         public Builder converter(Converter converter) {
             this.converter = converter;
-            return this;
-        }
-
-        /**
-         * If you want to send a cached response back down the event bus.
-         *
-         * OkHTTP does the response caching for us.
-         * @param requestUriMinusBase Used to find the cached response
-         * @param callback The object that will be sent back down the event bus
-         */
-        public Builder cacheRequest(String requestUriMinusBase, CachedResponse<ReturnResult> callback) {
-            this.cachedResponseUri = requestUriMinusBase;
-            this.cacheResponse = callback;
             return this;
         }
 
@@ -100,14 +73,26 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
          *
          *               This is especially useful for Fragment.getArguments(), which persist on Fragment recreation.
          */
-        public Builder dontRerequestExistingRequest(Bundle bundleWithUuid) {
+        public Builder doNotReRequestExistingRequest(Bundle bundleWithUuid) {
             this.requestUuidBundle = bundleWithUuid;
             return this;
         }
 
+
+        /*
+         * If you want to send a cached response back down the event bus.
+         *
+         * OkHTTP does the response caching for us.
+         * @param requestUriMinusBase Used to find the cached response
+         */
+        public Builder cacheRequest(String requestUriMinusBase) {
+            this.cachedResponseUri = requestUriMinusBase;
+            return this;
+        }
+
+
         /**
          * Set this if you want to return a specific object if the server's response is empty
-         * @return
          */
         public Builder detectEmptyResponse(IsEmpty<ReturnResult> isEmptyCallback, ResponseEmpty isEmptyObject) {
             this.isEmptyCallback = isEmptyCallback;
@@ -117,7 +102,6 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
 
         public NetworkingMessageBusService<ReturnResult, ServiceClass> create() {
             NetworkingMessageBusService<ReturnResult, ServiceClass> service = new NetworkingMessageBusService<ReturnResult, ServiceClass>(
-                    cacheResponse,
                     cachedResponseUri,
                     requestUuidBundle,
                     isEmptyCallback,
@@ -130,13 +114,11 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
     }
 
     private NetworkingMessageBusService(
-            CachedResponse<ReturnResult> cacheResponse,
             String cachedResponseUri,
             Bundle requestUuidBundle,
-            IsEmpty isEmptyCallback,
+            IsEmpty<ReturnResult> isEmptyCallback,
             ResponseEmpty isEmptyObject,
             Converter converter) {
-        this.mCacheResponse = cacheResponse;
         this.mCachedResponseUri = cachedResponseUri;
         this.mRequestUuidBundle = requestUuidBundle;
         this.mIsEmptyCallback = isEmptyCallback;
@@ -173,7 +155,6 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
         // Cached response
         returnCacheIfAvailable(
                     baseUrl+ mCachedResponseUri,
-                mCacheResponse,
                 mIsEmptyCallback,
                 mIsEmptyObject,
                     returnType);
@@ -261,40 +242,40 @@ public class NetworkingMessageBusService<ReturnResult, ServiceClass> {
 
     private void returnCacheIfAvailable(
             final String fullCachedUrl,
-            final CachedResponse<ReturnResult> cacheResponse,
             final IsEmpty<ReturnResult> isEmptyCallback,
             final ResponseEmpty isEmptyResponse,
             final Class<? extends ReturnResult> returnType) {
-        if(cacheResponse!=null) {
-            new AsyncTask<Void, Void, ReturnResult>() {
-                @Override
-                protected ReturnResult doInBackground(Void... params) {
-                    try {
-                        Log.d(TAG, "Attempting to send back cached version");
-                        ReturnResult cached = ResponseCache.getObject(fullCachedUrl, returnType);
-                        Log.d(TAG, "Sending back cached version");
-                        return cached;
-                    } catch(Exception e) {
-                        Log.d(TAG, "Problem getting from cache", e);
-                        return null;
-                    }
+        if(fullCachedUrl==null || fullCachedUrl.trim().length()==0) return;
+        new AsyncTask<Void, Void, ReturnResult>() {
+            @Override
+            protected ReturnResult doInBackground(Void... params) {
+                try {
+                    Log.d(TAG, "Attempting to send back cached version");
+                    ReturnResult cached = ResponseCache.getObject(fullCachedUrl, returnType);
+                    Log.d(TAG, "Sending back cached version");
+                    return cached;
+                } catch (Exception e) {
+                    Log.d(TAG, "Problem getting from cache", e);
+                    return null;
                 }
-                @Override
-                protected void onPostExecute(ReturnResult res) {
-                    Log.d(TAG, "onPostExecute() (cached)");
-                    if(res!=null && isEmptyCallback!=null && isEmptyResponse!=null && isEmptyCallback.isEmpty(res)) {
-                        Log.d(TAG, "onPostExecute() detected cached empty response.");
-                        isEmptyResponse.setIsFromCache(true);
-                        Application.getEventBus().post(isEmptyResponse);
-                    } else if(res!=null) {
-                        Log.d(TAG, "onPostExecute() Sending back cached response initially.");
-                        Application.getEventBus().post(cacheResponse.setCache(res));
-                    } else {
-                        Log.d(TAG, "onPostExecute() No cached result to send back.");
-                    }
+            }
+
+            @Override
+            protected void onPostExecute(ReturnResult res) {
+                Log.d(TAG, "onPostExecute() (cached)");
+                if (res != null && isEmptyCallback != null && isEmptyResponse != null && isEmptyCallback.isEmpty(res)) {
+                    Log.d(TAG, "onPostExecute() detected cached empty response.");
+                    isEmptyResponse.setIsFromCache(true);
+                    Application.getEventBus().post(isEmptyResponse);
+                } else if (res != null) {
+                    Log.d(TAG, "onPostExecute() Sending back cached response initially.");
+                    res.setFromCache(true);
+                    Application.getEventBus().post(res);
+                } else {
+                    Log.d(TAG, "onPostExecute() No cached result to send back.");
                 }
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private OkClient createHttpClient() {

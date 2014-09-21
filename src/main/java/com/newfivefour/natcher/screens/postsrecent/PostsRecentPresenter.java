@@ -31,12 +31,11 @@ public class PostsRecentPresenter implements Presenter {
 
     @Subscribe
     public void recentPosts(PostsRecentService.RecentPosts posts) {
-        mView.setRecentPosts(posts);
-    }
-
-    @Subscribe
-    public void recentPostsCached(PostsRecentService.RecentPostsCached cached) {
-        mView.setRecentPostsFromCache(cached.returnCached());
+        if(posts.isIsCached()) {
+            mView.setRecentPostsFromCache(posts);
+        } else {
+            mView.setRecentPosts(posts);
+        }
     }
 
     @Subscribe
