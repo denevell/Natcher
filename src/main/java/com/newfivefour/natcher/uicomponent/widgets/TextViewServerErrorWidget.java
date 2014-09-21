@@ -16,9 +16,9 @@ public class TextViewServerErrorWidget implements ServerErrorView {
 
     @Override public void setRefreshableConnector(OnRefresh connector) { }
     @Override
-    public void showServerError(boolean show) {
+    public void showServerError(boolean show, int code, String message) {
         if (show) {
-            Toast.makeText(mApplicationContext, "A server error - oh no", Toast.LENGTH_LONG).show();
+            Toast.makeText(mApplicationContext, "A server error,  called " + code + " - oh no: " + message, Toast.LENGTH_LONG).show();
         }
     }
 }

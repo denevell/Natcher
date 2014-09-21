@@ -77,8 +77,8 @@ public class PostAddFragment extends Fragment {
         mAddPost.getUiComponentDelegate().populateStarting();
     }
 
-    public void addPostError(int errorCode) {
-        mAddPost.getUiComponentDelegate().populateFromServerError(errorCode);
+    public void addPostError(int errorCode, String message) {
+        mAddPost.getUiComponentDelegate().populateFromServerError(errorCode, message);
     }
 
     public void addPostSuccess(PostAdded postAdd) {

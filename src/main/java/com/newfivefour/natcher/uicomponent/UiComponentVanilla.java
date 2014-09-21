@@ -163,7 +163,6 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
      * on a creation, since you'll be getting the data again.
      */
     private boolean mStartOutOfComponentLoaderAfterCachedResult = true;
-    private boolean mStartOutOfComponentLoaderAfterCachedEmptyResult = true;
 
     public UiComponentVanilla(Populatable<T> populatable) {
         mPopulatable = populatable;
@@ -256,7 +255,6 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     public void populateStarting() {
         Log.d(TAG, "populateStarting()");
         mStartOutOfComponentLoaderAfterCachedResult = true;
-        mStartOutOfComponentLoaderAfterCachedEmptyResult = true;
         setEmptyError(false);
         hideServerErrors();
         hideKeyboard();
@@ -324,18 +322,17 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
      * 3. Empty displays
      */
     @Override
-    public void populateFromServerError(int responseCode) {
+    public void populateFromServerError(int responseCode, String errorMessage) {
         Log.d(TAG, "populateFromServerError()");
         mStartOutOfComponentLoaderAfterCachedResult = false;
-        mStartOutOfComponentLoaderAfterCachedEmptyResult = false;
         if(mPopulatable.showInComponentServerError()) {
             Log.d(TAG, "populateFromServerError(): empty view content");
-            setOutOfComponentServerError(false);
-            setInComponentServerError(true);
+            setOutOfComponentServerError(false, 0, null);
+            setInComponentServerError(true, responseCode, errorMessage);
         } else if(mPopulatable.showOutOfComponentServerError()) {
             Log.d(TAG, "populateFromServerError(): non empty view content");
-            setInComponentServerError(false);
-            setOutOfComponentServerError(true);
+            setInComponentServerError(false, 0, null);
+            setOutOfComponentServerError(true, responseCode, errorMessage);
         }
         setOutOfComponentLoading(false);
         setLoading(false);
@@ -360,7 +357,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
         Log.d(TAG, "populateWithEmptyContentFromCache()");
         mPopulatable.clearContentOnEmptyResponse();
         setLoading(false);
-        if(mStartOutOfComponentLoaderAfterCachedEmptyResult && mPopulatable.showOutOfComponentLoading()) {
+        if(mStartOutOfComponentLoaderAfterCachedResult && mPopulatable.showOutOfComponentLoading()) {
             setOutOfComponentLoading(true);
         }
         hideServerErrors();
@@ -380,7 +377,7 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     @Override
     public void populateWithEmptyContentFromServer() {
         Log.d(TAG, "populateWithEmptyContentFromServer()");
-        mStartOutOfComponentLoaderAfterCachedEmptyResult = false;
+        mStartOutOfComponentLoaderAfterCachedResult = false;
         mPopulatable.clearContentOnEmptyResponse();
         setOutOfComponentLoading(false);
         setLoading(false);
@@ -395,19 +392,19 @@ public class UiComponentVanilla<T> implements UiComponent<T> {
     }
 
     private void hideServerErrors() {
-        setInComponentServerError(false);
-        setOutOfComponentServerError(false);
+        setInComponentServerError(false, 0, null);
+        setOutOfComponentServerError(false, 0, null);
     }
 
-    private void setInComponentServerError(boolean show) {
+    private void setInComponentServerError(boolean show, int code, String message) {
         if(mInComponentServerErrorView !=null) {
-            mInComponentServerErrorView.showServerError(show);
+            mInComponentServerErrorView.showServerError(show, code, message);
         }
     }
 
-    private void setOutOfComponentServerError(boolean show) {
+    private void setOutOfComponentServerError(boolean show, int code, String message) {
         if(mOutOfComponentServerErrorView !=null) {
-            mOutOfComponentServerErrorView.showServerError(show);
+            mOutOfComponentServerErrorView.showServerError(show, code, message);
         }
     }
 

@@ -10,16 +10,14 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
 @SuppressWarnings("unchecked")
-public class OnPopulateStartingTests {
+public class OnPopulateFromServerTests {
 
-    private final Runnable hideKeyboard;
     private final Populatable populatable;
     private final UiComponentVanilla<Object> uiComponent;
     private final LoadingView loaderInComponent;
@@ -28,10 +26,9 @@ public class OnPopulateStartingTests {
     private final ServerErrorView serverErrorViewInComponent;
     private final ServerErrorView serverErrorViewOutOfComponent;
 
-    public OnPopulateStartingTests() {
+    public OnPopulateFromServerTests() {
         populatable = mock(Populatable.class);
 
-        hideKeyboard = mock(Runnable.class);
         loaderInComponent = mock(LoadingView.class);
         loaderOutOfComponent = mock(LoadingView.class);
         emptyView = mock(EmptyView.class);
@@ -39,7 +36,6 @@ public class OnPopulateStartingTests {
         serverErrorViewOutOfComponent = mock(ServerErrorView.class);
 
         uiComponent = new UiComponentVanilla<Object>(populatable);
-        uiComponent.setHideKeyboard(hideKeyboard);
         uiComponent.setInComponentLoadingDisplay(loaderInComponent);
         uiComponent.setOutOfComponentLoadingDisplay(loaderOutOfComponent);
         uiComponent.setOutOfComponentServerErrorDisplay(serverErrorViewOutOfComponent);
@@ -48,66 +44,57 @@ public class OnPopulateStartingTests {
     }
 
     @Test
-    public void shouldHideKeyboard() {
-        // Act
-        uiComponent.populateStarting();
-        verify(hideKeyboard).run();
-    }
-
-    @Test
     public void shouldHideServerErrors() {
+        // Arrange
+        Object object = new Object();
+
         // Act
-        uiComponent.populateStarting();
+        uiComponent.populateFromServer(object);
         verify(serverErrorViewInComponent).showServerError(false, 0, null);
         verify(serverErrorViewOutOfComponent).showServerError(false, 0, null);
     }
 
     @Test
     public void shouldHideEmptyView() {
+        // Arrange
+        Object object = new Object();
+
         // Act
-        uiComponent.populateStarting();
+        uiComponent.populateFromServer(object);
         verify(emptyView).showEmpty(false);
     }
 
     @Test
-    public void shouldShowInComponentLoadingIfCallbackSaysOkay() {
+    public void shouldHideInComponentLoader() {
         // Arrange
-        when(populatable.showInComponentLoading()).thenReturn(true);
+        Object object = new Object();
 
         // Act
-        uiComponent.populateStarting();
-        verify(loaderInComponent).showLoading(true);
+        uiComponent.populateFromServer(object);
+        verify(loaderInComponent).showLoading(false);
     }
 
     @Test
-    public void shouldNotShowInComponentLoadingIfCallbackSaysNo() {
-        // Arrange
-        when(populatable.showInComponentLoading()).thenReturn(false);
-
-        // Act
-        uiComponent.populateStarting();
-        verify(loaderInComponent, never()).showLoading(true);
-    }
-
-    @Test
-    public void shouldShowOutOfComponentLoadingIfCallbackSaysOkay() {
+    public void shouldHideOutOfComponentLoaderWhenActive() {
         // Arrange
         when(populatable.showInComponentLoading()).thenReturn(false);
         when(populatable.showOutOfComponentLoading()).thenReturn(true);
+        Object object = new Object();
 
         // Act
         uiComponent.populateStarting();
-        verify(loaderOutOfComponent).showLoading(true);
+        uiComponent.populateFromServer(object);
+        verify(loaderOutOfComponent).showLoading(false);
     }
 
     @Test
-    public void shouldNotShowOutOfComponentLoadingIfCallbackSaysNo() {
+    public void shouldPopulateOnServerResult() {
         // Arrange
-        when(populatable.showInComponentLoading()).thenReturn(false);
-        when(populatable.showOutOfComponentLoading()).thenReturn(false);
+        Object object = new Object();
 
         // Act
-        uiComponent.populateStarting();
-        verify(loaderOutOfComponent, never()).showLoading(true);
+        uiComponent.populateFromServer(object);
+        verify(populatable).populateOnSuccessfulResponse(object);
     }
+
 }

@@ -31,7 +31,7 @@ public interface UiComponent<T> extends OnRefreshConnector, OnEmptyConnector {
     void populateStarting();
     void populateFromCache(T ob);
     void populateFromServer(T ob);
-    void populateFromServerError(int responseCode);
+    void populateFromServerError(int responseCode, String message);
     void populateWithEmptyContentFromServer();
     void populateWithEmptyContentFromCache();
 }

@@ -52,6 +52,6 @@ public class PostAddPresenter implements Presenter {
 
     @Subscribe
     public void addPostError(PostAddService.PostAddError error) {
-        mView.addPostError(error.responseCode);
+        mView.addPostError(error.responseCode, error.responseMessage);
     }
 }

@@ -89,7 +89,7 @@ public class PostsRecentsFragment extends Fragment {
     }
 
     public void setRecentPostsError(String s, int responseCode) {
-        mPostsRecentView.getUiComponentDelegate().populateFromServerError(responseCode);
+        mPostsRecentView.getUiComponentDelegate().populateFromServerError(responseCode, s);
     }
 
 }

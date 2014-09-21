@@ -106,7 +106,7 @@ public class LoadingErrorEmptyWidget implements
     }
 
     @Override
-    public void showServerError(boolean show) {
+    public void showServerError(boolean show, int code, String message) {
         setVisibleOrInvisible(mError, show);
     }
 

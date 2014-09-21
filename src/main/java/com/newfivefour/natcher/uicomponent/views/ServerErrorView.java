@@ -7,5 +7,10 @@ import com.newfivefour.natcher.uicomponent.events.OnRefreshConnector;
  * the showServerError() method herein.
  */
 public interface ServerErrorView extends OnRefreshConnector {
-    void showServerError(boolean show);
+    /**
+     * @param show
+     * @param code 0 when show is false
+     * @param message null when show is false
+     */
+    void showServerError(boolean show, int code, String message);
 }
