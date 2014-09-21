@@ -11,9 +11,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-/**
-* Created by user on 20/08/14.
-*/
 public class NukeSSLCerts {
     protected static final String TAG = "NukeSSLCerts";
     public static SSLContext sc;
